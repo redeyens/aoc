@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Input/Input1.txt" />
-    <EmbeddedResource Include="Input/Input2.txt" />
+    <EmbeddedResource Include="Input/TestInput.txt" />
+    <EmbeddedResource Include="Input/PuzzleInput.txt" />
   </ItemGroup>
 </Project>

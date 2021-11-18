@@ -8,12 +8,12 @@ namespace aoc.template
     {
         static void Main(string[] args)
         {
-            foreach (string line in Input1)
+            foreach (string line in TestInput)
             {
                 Console.WriteLine(line);
             }
 
-            foreach (string line in Input2)
+            foreach (string line in PuzzleInput)
             {
                 Console.WriteLine(line);
             }
@@ -21,29 +21,33 @@ namespace aoc.template
             Console.WriteLine("aoc.template completed.");
         }
 
-        private static IEnumerable<string> Input1
+        private static IEnumerable<string> TestInput
         {
             get
             {
-                return GetLinesFromResource("aoc.template.Input.Input1.txt");
+                return GetLinesFromResource("aoc.template.Input.TestInput.txt");
             }
         }
 
-        private static IEnumerable<string> Input2
+        private static IEnumerable<string> PuzzleInput
         {
             get
             {
-                return GetLinesFromResource("aoc.template.Input.Input2.txt");
+                return GetLinesFromResource("aoc.template.Input.PuzzleInput.txt");
             }
         }
 
         private static IEnumerable<string> GetLinesFromResource(string name)
         {
-            using (Stream in1Stream = System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream(name))
+            using (Stream inStream = System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream(name))
             {
-                using (TextReader in1Reader = new StreamReader(in1Stream))
+                using (TextReader inReader = new StreamReader(inStream))
                 {
-                    yield return in1Reader.ReadLine();
+                    string line;
+                    while ((line = inReader.ReadLine()) != null)
+                    {
+                        yield return line;
+                    }
                 }
             }
         }
