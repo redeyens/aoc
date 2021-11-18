@@ -1,2 +1,2 @@
-# aoc
-My Advent of code attempts
+# Advent of Code
+My Advent of Code attempts
