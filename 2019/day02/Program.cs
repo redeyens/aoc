@@ -9,13 +9,36 @@ namespace day02
     {
         static void Main(string[] args)
         {
-            var program = PuzzleInput
+            var originalProgram = PuzzleInput
                 .SelectMany(l => l.Split(',', StringSplitOptions.RemoveEmptyEntries))
                 .Select(s => int.Parse(s))
                 .ToArray();
 
-            program[1] = 12;
-            program[2] = 2;
+            bool found = false;
+
+            for (int noun = 0; noun < 100 && !found; noun++)
+            {
+                for (int verb = 0; verb < 100 && !found; verb++)
+                {
+                    int[] program = ExecuteProgram(originalProgram, noun, verb);
+
+                    if(program[0] == 19690720)    
+                    {
+                        Console.WriteLine(100 * noun + verb);
+                        found = true;
+                    }    
+                }
+            }
+
+            Console.WriteLine("day02 completed.");
+        }
+
+        private static int[] ExecuteProgram(int[] originalProgram, int noun, int verb)
+        {
+            var program = new int[originalProgram.Length];
+            Array.Copy(originalProgram, program, originalProgram.Length);
+            program[1] = noun;
+            program[2] = verb;
 
             int pc = 0;
             bool halt = false;
@@ -26,9 +49,9 @@ namespace day02
                 int aPointer = 0;
                 int bPointer = 0;
                 int cPointer = 0;
-                
-                 switch (opCode)
-                 {
+
+                switch (opCode)
+                {
                     case 1:
                         aPointer = program[pc + 1];
                         bPointer = program[pc + 2];
@@ -48,13 +71,11 @@ namespace day02
                         Console.WriteLine("Unknown opcode. Exiting.");
                         halt = true;
                         break;
-                 }
+                }
                 pc += 4;
             }
 
-            Console.WriteLine(program[0]);
-
-            Console.WriteLine("day02 completed.");
+            return program;
         }
 
         private static IEnumerable<string> TestInput
