@@ -5,16 +5,16 @@ namespace day03
 {
     internal class Wire
     {
-        private HashSet<Point2D> wirePoints;
+        private List<Point2D> wirePoints;
 
-        private Wire(HashSet<Point2D> wirePoints)
+        private Wire(List<Point2D> wirePoints)
         {
             this.wirePoints = wirePoints;
         }
 
         internal static Wire FromMoves(string moves)
         {
-            HashSet<Point2D> newWirePoints = new HashSet<Point2D>();
+            List<Point2D> newWirePoints = new List<Point2D>();
             string[] moveArray = moves.Split(", ".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
             Point2D currentLocation = new Point2D();
 
@@ -28,6 +28,11 @@ namespace day03
             }
 
             return new Wire(newWirePoints);
+        }
+
+        internal int GetTraceDistance(Point2D p)
+        {
+            return wirePoints.IndexOf(p) + 1;
         }
 
         internal IEnumerable<Point2D> Intersect(Wire wire)
