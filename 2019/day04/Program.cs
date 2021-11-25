@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace day04
 {
@@ -42,10 +44,28 @@ namespace day04
 
         private static bool HasDoubleDigits(int[] digits)
         {
-            HashSet<int> digitsSeen = new HashSet<int>();
-            digitsSeen.UnionWith(digits);
-            
-            return digitsSeen.Count < 6;
+            int count = 1;
+
+            for (int i = 1; i < digits.Length; i++)
+            {
+                if(digits[i - 1] == digits[i])
+                {
+                    count++;
+                }
+                else
+                {
+                    if(count == 2)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        count = 1;
+                    }
+                }
+            }
+
+            return count == 2;
         }
 
         private static int[] GetDigits(int num)
