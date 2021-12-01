@@ -10,17 +10,14 @@ namespace day01
         static void Main(string[] args)
         {
             var readings = PuzzleInput.Select(line => int.Parse(line)).ToArray();
-            int? previousWindow = null;
             int depthIncreases = 0;
 
-            for (int i = 1; i < readings.Length - 1; i++)
+            for (int i = 2; i < readings.Length - 1; i++)
             {
-                int currentWindow = readings[i - 1] + readings[i] + readings[i + 1];
-                if(previousWindow.HasValue && currentWindow > previousWindow.Value)
+                if(readings[i + 1] >readings[i - 2])
                 {
                     depthIncreases++;
                 }
-                previousWindow = currentWindow;
             }
 
             Console.WriteLine(depthIncreases);
