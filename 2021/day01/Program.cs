@@ -9,17 +9,18 @@ namespace day01
     {
         static void Main(string[] args)
         {
-            var readings = PuzzleInput.Select(line => int.Parse(line));
-            int? previousReading = null;
+            var readings = PuzzleInput.Select(line => int.Parse(line)).ToArray();
+            int? previousWindow = null;
             int depthIncreases = 0;
 
-            foreach (var meas in readings)
+            for (int i = 1; i < readings.Length - 1; i++)
             {
-                if(previousReading.HasValue && meas > previousReading.Value)
+                int currentWindow = readings[i - 1] + readings[i] + readings[i + 1];
+                if(previousWindow.HasValue && currentWindow > previousWindow.Value)
                 {
                     depthIncreases++;
                 }
-                previousReading = meas;
+                previousWindow = currentWindow;
             }
 
             Console.WriteLine(depthIncreases);
