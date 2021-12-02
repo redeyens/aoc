@@ -26,15 +26,16 @@ namespace day02
         private static Func<Position, Position> ParseCommand(string commandText)
         {
             string[] cmd = commandText.Split(" ", StringSplitOptions.RemoveEmptyEntries);
+            int cmdArg = int.Parse(cmd[1]);
 
             switch (cmd[0][0])
             {
                 case 'u':
-                    return (p) => new Position(p.Depth - int.Parse(cmd[1]), p.HPos);
+                    return (p) => new Position(p.Depth, p.HPos, p.Aim - cmdArg);
                 case 'd':
-                    return (p) => new Position(p.Depth + int.Parse(cmd[1]), p.HPos);
+                    return (p) => new Position(p.Depth, p.HPos, p.Aim + cmdArg);
                 case 'f':
-                    return (p) => new Position(p.Depth, p.HPos + int.Parse(cmd[1]));
+                    return (p) => new Position(p.Depth + (p.Aim * cmdArg), p.HPos + cmdArg, p.Aim);
                 default:
                     return (p) => {Console.WriteLine($"Invalid command '{commandText}'."); return p;};
             }

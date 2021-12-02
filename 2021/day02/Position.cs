@@ -4,10 +4,12 @@ namespace day02
     {
         public int Depth { get; }
         public int HPos { get; }
-        public Position(int depth, int hPos)
+        public int Aim { get; }
+        public Position(int depth, int hPos, int aim)
         {
             this.Depth = depth;
             this.HPos = hPos;
+            this.Aim = aim;
         }
     }
 }
