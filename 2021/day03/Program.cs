@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace day03
 {
@@ -8,45 +9,30 @@ namespace day03
     {
         static void Main(string[] args)
         {
-            int[] countOnes = null;
-            int sampleCount = 0;
+            int pos = 0;
+            List<string> oxyRatingNumbers = PuzzleInput.ToList();
+            List<string> scrubberRatingNumbers = PuzzleInput.ToList();
 
-            foreach (string line in PuzzleInput)
+            while (oxyRatingNumbers.Count > 1 || scrubberRatingNumbers.Count > 1)
             {
-                if(countOnes == null)
-                {
-                    countOnes = new int[line.Length];
-                }
+                oxyRatingNumbers = oxyRatingNumbers.GroupBy(num => num[pos]).OrderByDescending(ComapreRatings()).First().ToList();
 
-                for (int i = 0; i < line.Length; i++)
-                {
-                    countOnes[i] += line[i] - '0';
-                }
+                scrubberRatingNumbers = scrubberRatingNumbers.GroupBy(num => num[pos]).OrderBy(ComapreRatings()).First().ToList();
 
-                sampleCount++;
+                pos++;
             }
 
-            int gammaRate = 0;
-            int epsilonRate = 0;
+            int oxyRating = Convert.ToInt32(oxyRatingNumbers[0], 2);
+            int scrubberRating = Convert.ToInt32(scrubberRatingNumbers[0], 2);
 
-            for (int i = 0; i < countOnes.Length; i++)
-            {
-                gammaRate <<= 1;
-                epsilonRate <<= 1;
-
-                if(countOnes[i] > (sampleCount / 2))
-                {
-                    gammaRate |= 1;
-                }
-                else
-                {
-                    epsilonRate |= 1;
-                }
-            }
-
-            Console.WriteLine(gammaRate * epsilonRate);
+            Console.WriteLine(oxyRating * scrubberRating);
 
             Console.WriteLine("day03 completed.");
+        }
+
+        private static Func<IGrouping<char, string>, int> ComapreRatings()
+        {
+            return group => group.Count() * 10 + (group.Key - '0');
         }
 
         private static IEnumerable<string> TestInput
