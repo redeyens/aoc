@@ -11,20 +11,28 @@ namespace day04
         {
             int[] numbers = PuzzleInput.Take(1).SelectMany(line => line.Split(',')).Select(int.Parse).ToArray();
 
-            List<BingoBoard> boards = ParseBoards(PuzzleInput.Skip(2)).ToList();
+            HashSet<BingoBoard> boards = new HashSet<BingoBoard>();
+            foreach (var board in ParseBoards(PuzzleInput.Skip(2)))
+            {
+                boards.Add(board);
+            }
 
             int cnt = 0;
-
             bool weHaveAWinner = false;
             foreach (var number in numbers)
             {
-                foreach (var board in boards)
+                foreach (var board in boards.ToList())
                 {
                     board.Play(number);
                     if(board.HasBingo)
                     {
-                        Console.WriteLine($"{++cnt}. {board.ScoreFactor * number}");
-                        weHaveAWinner = true;
+                        if(boards.Count() == 1)
+                        {
+                            Console.WriteLine($"{++cnt}. {board.ScoreFactor * number}");
+
+                            weHaveAWinner = true;
+                        }
+                       boards.Remove(board);
                     }
                 }
 
