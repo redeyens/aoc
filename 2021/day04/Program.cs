@@ -9,26 +9,30 @@ namespace day04
     {
         static void Main(string[] args)
         {
-            int[] numbers = PuzzleInput.Take(1).SelectMany(line => line.Split(',')).Select(int.Parse).ToArray();
+            string[] inputBlocks = PuzzleInputText.Split(Environment.NewLine + Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
+
+            IEnumerable<int> numbersDrawn = inputBlocks[0].Split(',').Select(int.Parse);
 
             HashSet<BingoBoard> boards = new HashSet<BingoBoard>();
-            foreach (var board in ParseBoards(PuzzleInput.Skip(2)))
+            foreach (BingoBoard board in inputBlocks[1..].Select(BingoBoard.FromString))
             {
                 boards.Add(board);
             }
 
-            int cnt = 0;
             bool weHaveAWinner = false;
-            foreach (var number in numbers)
+            List<BingoBoard> workingSet = new List<BingoBoard>(boards.Count());
+            foreach (int number in numbersDrawn)
             {
-                foreach (var board in boards.ToList())
+                workingSet.Clear();
+                workingSet.AddRange(boards);
+                foreach (BingoBoard board in workingSet)
                 {
                     board.Play(number);
                     if(board.HasBingo)
                     {
                         if(boards.Count() == 1)
                         {
-                            Console.WriteLine($"{++cnt}. {board.ScoreFactor * number}");
+                            Console.WriteLine(board.ScoreFactor * number);
 
                             weHaveAWinner = true;
                         }
@@ -45,22 +49,19 @@ namespace day04
             Console.WriteLine("day04 completed.");
         }
 
-        private static IEnumerable<BingoBoard> ParseBoards(IEnumerable<string> inputLines)
+        private static string TestInputText
         {
-            int[][] numbers = new int[5][];
-            int rowNum = 0;
-
-            foreach (var line in inputLines.Where(l => !string.IsNullOrWhiteSpace(l)))
+            get
             {
-                int[] row = line.Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToArray();
-                numbers[rowNum++] = row;
+                return GetTextFromResource("day04.Input.TestInput.txt");
+            }
+        }
 
-                if(rowNum == 5)
-                {
-                    yield return new BingoBoard(numbers);
-                    numbers = new int[5][];
-                    rowNum = 0;
-                }    
+        private static string PuzzleInputText
+        {
+            get
+            {
+                return GetTextFromResource("day04.Input.PuzzleInput.txt");
             }
         }
 
@@ -91,6 +92,17 @@ namespace day04
                     {
                         yield return line;
                     }
+                }
+            }
+        }
+
+        private static string GetTextFromResource(string name)
+        {
+            using (Stream inStream = System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream(name))
+            {
+                using (TextReader inReader = new StreamReader(inStream))
+                {
+                    return inReader.ReadToEnd();
                 }
             }
         }

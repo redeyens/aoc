@@ -6,60 +6,21 @@ namespace day04
 {
     internal class BingoBoard
     {
+        private const byte EntireRowSelected = 31;
         private int[][] numbers;
         private byte[] numbersDrawn = new byte[5];
 
-        public BingoBoard(int[][] numbers)
+        internal static BingoBoard FromString(string input)
         {
-            this.numbers = numbers;
-        }
+            int[][] numbers = new int[5][];
+            int rowNum = 0;
 
-        public bool HasBingo 
-        { 
-            get
+            foreach (var line in input.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries))
             {
-                return HasAnyRow() || HasAnyCol();
-            } 
-        }
-
-        private bool HasAnyCol()
-        {
-            return numbersDrawn.Where(n => n == 31).Any();
-        }
-
-        private bool HasAnyRow()
-        {
-            return numbersDrawn.Aggregate(31, (res, b) => res &= b) > 0;
-        }
-
-        public int ScoreFactor 
-        { 
-            get
-            {
-                return GetNumbers().Zip(GetWeights(), (n, w) => n * w).Sum();
-            } 
-        }
-
-        private IEnumerable<int> GetNumbers()
-        {
-            for (int i = 0; i < 5; i++)
-            {
-                for (int j = 0; j < 5; j++)
-                {
-                    yield return numbers[i][j];
-                }
+                numbers[rowNum++] = line.Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToArray();
             }
-        }
 
-        private IEnumerable<int> GetWeights()
-        {
-            for (int i = 0; i < 5; i++)
-            {
-                for (int j = 0; j < 5; j++)
-                {
-                    yield return (((numbersDrawn[i] >> j) & 1) == 0) ? 1 : 0;
-                }
-            }
+            return new BingoBoard(numbers);
         }
 
         internal void Play(int number)
@@ -74,6 +35,31 @@ namespace day04
                         return;
                     }
                 }
+            }
+        }
+
+        public bool HasBingo => HasAnyCol() || HasAnyRow();
+
+        public int ScoreFactor =>  GetNumbers().Zip(GetWeights(), (n, w) => n * w).Sum();
+
+        private BingoBoard(int[][] numbers)
+        {
+            this.numbers = numbers;
+        }
+
+        private bool HasAnyRow() => numbersDrawn.Where(n => n == EntireRowSelected).Any();
+
+        private bool HasAnyCol() => numbersDrawn.Aggregate(EntireRowSelected, (res, row) => res &= row) > 0;
+
+        private IEnumerable<int> GetNumbers() => numbers.SelectMany(row => row);
+
+        private IEnumerable<int> GetWeights() =>numbersDrawn.SelectMany(row => WeightsFromByte(row));
+
+        private IEnumerable<int> WeightsFromByte(byte row)
+        {
+            for (int j = 0; j < 5; j++)
+            {
+                yield return (((row >> j) & 1) == 0) ? 1 : 0;
             }
         }
     }
