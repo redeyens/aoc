@@ -46,6 +46,7 @@ Consider only horizontal and vertical lines. **At how many points do at least tw
 Your puzzle answer was `6397`.
 
 --- Part Two ---
+
 Unfortunately, considering only horizontal and vertical lines doesn't give you the full picture; you need to also consider **diagonal lines**.
 
 Because of the limits of the hydrothermal vent mapping system, the lines in your list will only ever be horizontal, vertical, or a diagonal line at exactly 45 degrees. In other words:
