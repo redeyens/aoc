@@ -13,7 +13,6 @@ namespace day05
 
             Console.WriteLine(
             lines
-                .Where(l => l.IsVertical || l.IsHorizontal)
                 .SelectMany(l => l.Points)
                 .GroupBy(p => p)
                 .Where(g => g.Count() > 1)
