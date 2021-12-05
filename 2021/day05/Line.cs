@@ -16,7 +16,7 @@ namespace day05
 
         public bool IsVertical => startPoint.X == endPoint.X;
         public bool IsHorizontal => startPoint.Y == endPoint.Y;
-        public IEnumerable<object> Points 
+        public IEnumerable<Point2D> Points 
         { 
             get
             {
