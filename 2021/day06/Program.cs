@@ -18,7 +18,7 @@ namespace day06
                 fishNumByAge[fishAgeGroup.age] = fishAgeGroup.num;
             }
 
-            for (int i = 0; i < 80; i++)
+            for (int i = 0; i < 256; i++)
             {
                 long spawningToday = fishNumByAge[0];
                 for (int j = 1; j < 9; j++)
