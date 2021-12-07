@@ -28,7 +28,7 @@ namespace day07
         private static int FuelRequired(int x1, int x2)
         {
             int range = Math.Abs(x1 - x2);
-            return (int)Math.Round((range * (range + 1)) / 2.0);
+            return (range * (range + 1)) / 2;
         }
 
         private static int GetMedian(int[] values)
