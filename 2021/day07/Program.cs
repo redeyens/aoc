@@ -10,15 +10,25 @@ namespace day07
         static void Main(string[] args)
         {
             int[] crabs = PuzzleInput.First().Split(',').Select(int.Parse).OrderBy(n => n).ToArray();
-            int median = 0;
+            int average = 0;
 
-            median = GetMedian(crabs);
+            average = (int)Math.Round(crabs.Average());
 
-            int fuelRq = crabs.Select(c => Math.Abs(c - median)).Sum();
+            int fuelRq1 = crabs.Select(c => FuelRequired(c, average - 1)).Sum();
+            int fuelRq2 = crabs.Select(c => FuelRequired(c, average)).Sum();
+            int fuelRq3 = crabs.Select(c => FuelRequired(c, average + 1)).Sum();
+
+            int fuelRq = Math.Min(Math.Min(fuelRq1, fuelRq2), fuelRq3);
 
             Console.WriteLine(fuelRq);
 
             Console.WriteLine("day07 completed.");
+        }
+
+        private static int FuelRequired(int x1, int x2)
+        {
+            int range = Math.Abs(x1 - x2);
+            return (int)Math.Round((range * (range + 1)) / 2.0);
         }
 
         private static int GetMedian(int[] values)
