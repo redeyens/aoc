@@ -9,10 +9,27 @@ namespace day19_at2
         private List<List<string>> options;
         private Func<string, Rule> ruleLookup;
 
-        public Rule(List<List<string>> options, Func<string, Rule> ruleLookup)
+        private Rule(List<List<string>> options, Func<string, Rule> ruleLookup)
         {
             this.options = options;
             this.ruleLookup = ruleLookup;
+        }
+
+        internal static KeyValuePair<string, Rule> FromString(string rule, Func<string, Rule> ruleLookup)
+        {
+            string[] ruleDef = rule.Split(':');
+            var ruleId = ruleDef[0];
+            string[] optionsDef = ruleDef[1].Split('|');
+            var options = new List<List<string>>(optionsDef.Length);
+            foreach (var optionDef in optionsDef)
+            {
+                string[] sequenceDef = optionDef.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                List<string> sequence = new List<string>(sequenceDef.Length);
+                sequence.AddRange(sequenceDef.Select(item => item.Trim('"')));
+                options.Add(sequence);
+            }
+
+            return new KeyValuePair<string, Rule>(ruleId, new Rule(options, ruleLookup));
         }
 
         internal IEnumerable<string> MatchMessage(string message)
