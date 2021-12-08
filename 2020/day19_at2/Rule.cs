@@ -6,43 +6,43 @@ namespace day19_at2
 {
     internal abstract class Rule
     {
-        internal static Rule FromString(string rule, Func<string, Rule> ruleLookup)
+        internal static Rule FromString(string ruleDefinition, Func<string, Rule> ruleLookup)
         {
-            string[] optionsDef = rule.Split('|');
-            var options = new List<List<string>>(optionsDef.Length);
-            foreach (var optionDef in optionsDef)
+            if(ruleDefinition.Contains('|'))
             {
-                string[] sequenceDef = optionDef.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-                List<string> sequence = new List<string>(sequenceDef.Length);
-                sequence.AddRange(sequenceDef.Select(item => item.Trim('"')));
-                options.Add(sequence);
+                return ParseOptions(ruleDefinition, ruleLookup);
             }
 
-            IEnumerable<string> terminals = options.SelectMany(options => options);
-            if (terminals.Count() == 1 && terminals.Where(t => char.IsLetter(t[0])).Any())
+            if(ruleDefinition.Contains('"'))
             {
-                return new Literal(terminals.First());
+                return ParseLiteral(ruleDefinition);
             }
-            else if (options.Count == 1)
+
+            return ParseSequence(ruleDefinition, ruleLookup);
+        }
+
+        private static Rule ParseLiteral(string ruleDefinition)
+        {
+            return new Literal(ruleDefinition.Trim().Trim('"'));
+        }
+
+        private static Rule ParseOptions(string optionsDefinition, Func<string, Rule> ruleLookup)
+        {
+            return new Options(optionsDefinition.Split('|').Select(optDef => ParseSequence(optDef, ruleLookup)));
+        }
+
+        private static Rule ParseSequence(string sequenceDefinition, Func<string, Rule> ruleLookup)
+        {
+            var refs = sequenceDefinition
+                        .Split(' ', StringSplitOptions.RemoveEmptyEntries)
+                        .Select(r => new Reference(r, ruleLookup));
+            if(refs.Take(2).Count() == 1)
             {
-                if(options.First().Take(2).Count() == 1)
-                {
-                    return new Reference(options.First().First(), ruleLookup);    
-                }
-                else
-                {
-                    return new Sequence(options.First().Select(r => new Reference( r, ruleLookup)));
-                }
-            }
-            else if (options.Count == 2)
-            {
-                return new Options(options.Select(seq => seq.Count == 1 ? 
-                                                        (Rule)new Reference(seq.First(), ruleLookup) : 
-                                                        (Rule)new Sequence(seq.Select(r => new Reference(r, ruleLookup)))));
+                return refs.First();    
             }
             else
             {
-                throw new NotImplementedException();
+                return new Sequence(refs);
             }
         }
 
