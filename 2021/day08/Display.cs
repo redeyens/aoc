@@ -50,20 +50,20 @@ namespace day08
 
             var digitClasses = pattern.GroupBy(d => d.Length).ToDictionary(g => g.Key, g => g.ToList());
 
-            string digit = digitClasses[2].First();
-            segmentCandidates['c'] = new HashSet<char>(digit);
-            segmentCandidates['f'] = new HashSet<char>(digit);
+            string segmentsInClass2 = digitClasses[2].First();
+            segmentCandidates['c'] = new HashSet<char>(segmentsInClass2);
+            segmentCandidates['f'] = new HashSet<char>(segmentsInClass2);
 
-            digit = digitClasses[3].First();
-            segmentCandidates['a'] = new HashSet<char>(digit.Where(c => !segmentCandidates['c'].Contains(c) && !segmentCandidates['f'].Contains(c)));
+            string segmentsInClass3 = digitClasses[3].First();
+            segmentCandidates['a'] = new HashSet<char>(segmentsInClass3.Where(c => !segmentCandidates['c'].Contains(c) && !segmentCandidates['f'].Contains(c)));
 
-            digit = digitClasses[4].First();
-            var remaining = digit.Where(c => !segmentCandidates['c'].Contains(c) && !segmentCandidates['f'].Contains(c));
-            segmentCandidates['b'] = new HashSet<char>(remaining);
-            segmentCandidates['d'] = new HashSet<char>(remaining);
+            string segmentsInClass4 = digitClasses[4].First();
+            var newSegmentsInClass4 = segmentsInClass4.Where(c => !segmentCandidates['c'].Contains(c) && !segmentCandidates['f'].Contains(c));
+            segmentCandidates['b'] = new HashSet<char>(newSegmentsInClass4);
+            segmentCandidates['d'] = new HashSet<char>(newSegmentsInClass4);
 
             // 5 - 2, 3, 5 
-            var grouping4 = digitClasses[5]
+            var newSegmentsFromClass5 = digitClasses[5]
                             .SelectMany(d => d)
                             .Where(c => !segmentCandidates['c'].Contains(c)
                                      && !segmentCandidates['f'].Contains(c)
@@ -71,26 +71,26 @@ namespace day08
                                      && !segmentCandidates['b'].Contains(c)
                                      && !segmentCandidates['d'].Contains(c))
                             .GroupBy(c => c);
-            remaining = grouping4.Where(g => g.Count() == 3)
+            var allThreeHaveG = newSegmentsFromClass5.Where(g => g.Count() == 3)
                             .Select(g => g.Key);
-            segmentCandidates['g'] = new HashSet<char>(remaining);
+            segmentCandidates['g'] = new HashSet<char>(allThreeHaveG);
 
-            remaining = grouping4.Where(g => g.Count() == 1)
+            var onlyOneHasE = newSegmentsFromClass5.Where(g => g.Count() == 1)
                             .Select(g => g.Key);
-            segmentCandidates['e'] = new HashSet<char>(remaining);
+            segmentCandidates['e'] = new HashSet<char>(onlyOneHasE);
 
             // 6 - 0, 6, 9
-            var cde = digitClasses[6]
-                    .SelectMany(d => d)
-                    .GroupBy(c => c)
-                    .Where(g => g.Count() == 2)
-                    .Select(g => g.Key)
+            var cdeSegments = digitClasses[6]
+                    .SelectMany(digit => digit)
+                    .GroupBy(segment => segment)
+                    .Where(segmentGroup => segmentGroup.Count() == 2)
+                    .Select(segmentGroup => segmentGroup.Key)
                     .ToHashSet();
 
-            segmentCandidates['c'].IntersectWith(cde);
+            segmentCandidates['c'].IntersectWith(cdeSegments);
             segmentCandidates['f'].ExceptWith(segmentCandidates['c']);
 
-            segmentCandidates['d'].IntersectWith(cde);
+            segmentCandidates['d'].IntersectWith(cdeSegments);
             segmentCandidates['b'].ExceptWith(segmentCandidates['d']);
 
             mapping = segmentCandidates.ToDictionary(kvp => kvp.Value.First(), kvp => kvp.Key);
