@@ -29,9 +29,9 @@ namespace day19_at2
             }
         }
 
-        internal bool TryParse(string message, string rule)
+        internal bool TryParse(string message, string ruleId)
         {
-            return grammar["0"].MatchMessage(message).Where(residual => string.IsNullOrEmpty(residual)).Any();
+            return grammar[ruleId].MatchMessage(message).Where(residual => string.IsNullOrEmpty(residual)).Any();
         }
     }
 }
