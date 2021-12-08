@@ -11,14 +11,13 @@ namespace day08
         {
             HashSet<int> uniqueDigits = new HashSet<int>() {2, 4, 3, 7};
 
-            IEnumerable<string> allOutputDigits = PuzzleInput
+            IEnumerable<int> allOutputValues = PuzzleInput
                             .Select(line => SeventSegDisplay.FromString(line))
-                            .SelectMany(d => d.Output)
-                            .Where(o => uniqueDigits.Contains(o.Length));
+                            .Select(d => d.DecodedOutput);
             
             Console.WriteLine(
-                allOutputDigits
-                .Count()
+                allOutputValues
+                .Sum()
                 );
 
             Console.WriteLine("day08 completed.");
