@@ -6,16 +6,16 @@ namespace day19_at2
 {
     internal class Parser
     {
-        private Dictionary<string, List<List<string>>> grammar;
+        private Dictionary<string, Rule> grammar;
 
-        private Parser(Dictionary<string, List<List<string>>> grammar)
+        private Parser(Dictionary<string, Rule> grammar)
         {
             this.grammar = grammar;
         }
 
         internal static Parser FromGrammar(string grammarString)
         {
-            Dictionary<string,List<List<string>>> grammar = new Dictionary<string, List<List<string>>>();
+            Dictionary<string, Rule> grammar = new Dictionary<string, Rule>();
 
             foreach (var ruleString in grammarString.Split(Environment.NewLine))
             {
@@ -27,7 +27,7 @@ namespace day19_at2
             return new Parser(grammar);
         }
 
-        private static KeyValuePair<string, List<List<string>>> ParseRule(string rule)
+        private static KeyValuePair<string, Rule> ParseRule(string rule)
         {
             string[] ruleDef = rule.Split(':');
             var ruleId = ruleDef[0];
@@ -41,7 +41,7 @@ namespace day19_at2
                 options.Add(sequence);
             }
 
-            return new KeyValuePair<string, List<List<string>>>(ruleId, options);
+            return new KeyValuePair<string, Rule>(ruleId, new Rule(options));
         }
 
         internal void Update(string newOrUpdatedRules)
@@ -61,7 +61,7 @@ namespace day19_at2
 
         private IEnumerable<string> MatchMessage(string startingRule, string message)
         {
-            List<List<string>> ruleOptions = null;
+            Rule ruleOptions = null;
 
             // if the grammar does not contain this rule then it must be literal
             if(!grammar.TryGetValue(startingRule, out ruleOptions))
@@ -70,7 +70,7 @@ namespace day19_at2
             }
             else
             {
-                return MatchOptions(grammar[startingRule], message);
+                return MatchOptions(grammar[startingRule].Options, message);
             }
         }
 
