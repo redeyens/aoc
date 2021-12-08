@@ -6,11 +6,9 @@ namespace day19_at2
 {
     internal abstract class Rule
     {
-        internal static KeyValuePair<string, Rule> FromString(string rule, Func<string, Rule> ruleLookup)
+        internal static Rule FromString(string rule, Func<string, Rule> ruleLookup)
         {
-            string[] ruleDef = rule.Split(':');
-            var ruleId = ruleDef[0];
-            string[] optionsDef = ruleDef[1].Split('|');
+            string[] optionsDef = rule.Split('|');
             var options = new List<List<string>>(optionsDef.Length);
             foreach (var optionDef in optionsDef)
             {
@@ -23,26 +21,24 @@ namespace day19_at2
             IEnumerable<string> terminals = options.SelectMany(options => options);
             if (terminals.Count() == 1 && terminals.Where(t => char.IsLetter(t[0])).Any())
             {
-                return new KeyValuePair<string, Rule>(ruleId, new Literal(terminals.First()));
+                return new Literal(terminals.First());
             }
             else if (options.Count == 1)
             {
                 if(options.First().Take(2).Count() == 1)
                 {
-                    return new KeyValuePair<string, Rule>(ruleId, new Reference(options.First().First(), ruleLookup));    
+                    return new Reference(options.First().First(), ruleLookup);    
                 }
                 else
                 {
-                    return new KeyValuePair<string, Rule>(ruleId, new Sequence(options.First().Select(r => new Reference( r, ruleLookup))));
+                    return new Sequence(options.First().Select(r => new Reference( r, ruleLookup)));
                 }
             }
             else if (options.Count == 2)
             {
-                return new KeyValuePair<string, Rule>(
-                    ruleId,
-                    new Options(options.Select(seq => seq.Count == 1 ? 
+                return new Options(options.Select(seq => seq.Count == 1 ? 
                                                         (Rule)new Reference(seq.First(), ruleLookup) : 
-                                                        (Rule)new Sequence(seq.Select(r => new Reference(r, ruleLookup))))));
+                                                        (Rule)new Sequence(seq.Select(r => new Reference(r, ruleLookup)))));
             }
             else
             {

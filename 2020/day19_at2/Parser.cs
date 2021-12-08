@@ -23,9 +23,10 @@ namespace day19_at2
         {
             foreach (var ruleString in newOrUpdatedRules.Split(Environment.NewLine))
             {
-                var rule = Rule.FromString(ruleString, ruleId => grammar[ruleId]);
+                string[] ruleDef = ruleString.Split(':');
+                var rule = Rule.FromString(ruleDef[1], ruleId => grammar[ruleId]);
 
-                grammar[rule.Key] = rule.Value;
+                grammar[ruleDef[0]] = rule;
             }
         }
 
