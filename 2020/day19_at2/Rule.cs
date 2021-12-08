@@ -9,7 +9,7 @@ namespace day19_at2
         private List<List<string>> options;
         private Func<string, Rule> ruleLookup;
 
-        private Rule(List<List<string>> options, Func<string, Rule> ruleLookup)
+        protected Rule(List<List<string>> options, Func<string, Rule> ruleLookup)
         {
             this.options = options;
             this.ruleLookup = ruleLookup;
@@ -29,30 +29,20 @@ namespace day19_at2
                 options.Add(sequence);
             }
 
-            return new KeyValuePair<string, Rule>(ruleId, new Rule(options, ruleLookup));
-        }
-
-        internal IEnumerable<string> MatchMessage(string message)
-        {
-            // we need to temporarily redefine literal untill we sort out parsing
-            // it will be the only entry in the only sequence that is not a number
             IEnumerable<string> terminals = options.SelectMany(options => options);
             if (terminals.Count() == 1 && terminals.Where(t => char.IsLetter(t[0])).Any())
             {
-                return MatchLiteral(terminals.First(), message);
+                return new KeyValuePair<string, Rule>(ruleId, new Literal(terminals.First()));
             }
             else
             {
-                return MatchOptions(options, message);
+                return new KeyValuePair<string, Rule>(ruleId, new Rule(options, ruleLookup));
             }
         }
 
-        private IEnumerable<string> MatchLiteral(string literal, string message)
+        internal  virtual IEnumerable<string> MatchMessage(string message)
         {
-            if(message.StartsWith(literal))
-            {
-                yield return message.Substring(literal.Length);
-            }
+            return MatchOptions(options, message);
         }
 
         private IEnumerable<string> MatchOptions(List<List<string>> ruleOptions, string message)
