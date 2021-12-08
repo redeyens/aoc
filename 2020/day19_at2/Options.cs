@@ -9,7 +9,7 @@ namespace day19_at2
         private Rule firstOption;
         private Rule secondOption;
 
-        public Options(IEnumerable<Rule> options):base(null, null)
+        public Options(IEnumerable<Rule> options)
         {
             this.firstOption = options.First();
             this.secondOption = options.Skip(1).First();

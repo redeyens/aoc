@@ -8,7 +8,7 @@ namespace day19_at2
         private string ruleId;
         private Func<string, Rule> ruleLookup;
 
-        public Reference(string ruleId, Func<string, Rule> ruleLookup):base(null, ruleLookup)
+        public Reference(string ruleId, Func<string, Rule> ruleLookup)
         {
             this.ruleId = ruleId;
             this.ruleLookup = ruleLookup;

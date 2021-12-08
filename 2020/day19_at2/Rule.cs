@@ -6,15 +6,6 @@ namespace day19_at2
 {
     internal abstract class Rule
     {
-        private List<List<string>> options;
-        private Func<string, Rule> ruleLookup;
-
-        protected Rule(List<List<string>> options, Func<string, Rule> ruleLookup)
-        {
-            this.options = options;
-            this.ruleLookup = ruleLookup;
-        }
-
         internal static KeyValuePair<string, Rule> FromString(string rule, Func<string, Rule> ruleLookup)
         {
             string[] ruleDef = rule.Split(':');
@@ -42,12 +33,16 @@ namespace day19_at2
                 }
                 else
                 {
-                    return new KeyValuePair<string, Rule>(ruleId, new Sequence(options.First(), ruleLookup));
+                    return new KeyValuePair<string, Rule>(ruleId, new Sequence(options.First().Select(r => new Reference( r, ruleLookup))));
                 }
             }
             else if (options.Count == 2)
             {
-                return new KeyValuePair<string, Rule>(ruleId, new Options(options.Select(seq => seq.Count == 1 ? (Rule)new Reference(seq.First(), ruleLookup) : (Rule)new Sequence(seq, ruleLookup))));
+                return new KeyValuePair<string, Rule>(
+                    ruleId,
+                    new Options(options.Select(seq => seq.Count == 1 ? 
+                                                        (Rule)new Reference(seq.First(), ruleLookup) : 
+                                                        (Rule)new Sequence(seq.Select(r => new Reference(r, ruleLookup))))));
             }
             else
             {

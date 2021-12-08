@@ -8,21 +8,19 @@ namespace day19_at2
     {
         private Rule firstRule;
         private Rule secondRule;
-        private Func<string, Rule> ruleLookup;
 
-        internal Sequence(IEnumerable<string> ruleSequence, Func<string, Rule> ruleLookup):base(null, ruleLookup)
+        internal Sequence(IEnumerable<Rule> ruleSequence)
         {
-            this.firstRule = new Reference(ruleSequence.First(), ruleLookup);
+            this.firstRule = ruleSequence.First();
             if(ruleSequence.Skip(1).Take(2).Count() == 1)
             {
-                this.secondRule = new Reference(ruleSequence.Skip(1).First(), ruleLookup);
+                this.secondRule = ruleSequence.Skip(1).First();
             }
             else
             {
-                this.secondRule = new Sequence(ruleSequence.Skip(1), ruleLookup);
+                this.secondRule = new Sequence(ruleSequence.Skip(1));
             }
 
-            this.ruleLookup = ruleLookup;
         }
 
         internal override IEnumerable<string> MatchMessage(string message)
