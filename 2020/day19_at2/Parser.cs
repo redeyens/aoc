@@ -56,51 +56,51 @@ namespace day19_at2
 
         internal bool TryParse(string message, string rule)
         {
-            return MatchMessage(grammar, "0", message).Where(residual => string.IsNullOrEmpty(residual)).Any();
+            return MatchMessage("0", message).Where(residual => string.IsNullOrEmpty(residual)).Any();
         }
 
-        private IEnumerable<string> MatchMessage(Dictionary<string, List<List<string>>> grammar, string startingRule, string message)
+        private IEnumerable<string> MatchMessage(string startingRule, string message)
         {
             List<List<string>> ruleOptions = null;
 
             // if the grammar does not contain this rule then it must be literal
             if(!grammar.TryGetValue(startingRule, out ruleOptions))
             {
-                return MatchLiteral(grammar, startingRule, message);
+                return MatchLiteral(startingRule, message);
             }
             else
             {
-                return MatchOptions(grammar, grammar[startingRule], message);
+                return MatchOptions(grammar[startingRule], message);
             }
         }
 
-        private IEnumerable<string> MatchLiteral(Dictionary<string, List<List<string>>> grammar, string literal, string message)
+        private IEnumerable<string> MatchLiteral(string literal, string message)
         {
             if(message.StartsWith(literal))
             {
                 yield return message.Substring(literal.Length);
             }
         }
-        private IEnumerable<string> MatchOptions(Dictionary<string, List<List<string>>> grammar, List<List<string>> ruleOptions, string message)
+        private IEnumerable<string> MatchOptions(List<List<string>> ruleOptions, string message)
         {
             if(ruleOptions.Count == 1)
             {
-                return MatchSequence(grammar, ruleOptions[0], message);
+                return MatchSequence(ruleOptions[0], message);
             }
             else
             {
-                return MatchSequence(grammar, ruleOptions[0], message).Concat(MatchOptions(grammar, new List<List<string>>(ruleOptions.Skip(1)), message));
+                return MatchSequence(ruleOptions[0], message).Concat(MatchOptions(new List<List<string>>(ruleOptions.Skip(1)), message));
             }
         }
-        private IEnumerable<string> MatchSequence(Dictionary<string, List<List<string>>> grammar, List<string> ruleSequence, string message)
+        private IEnumerable<string> MatchSequence(List<string> ruleSequence, string message)
         {
             if(ruleSequence.Count == 1)
             {
-                return MatchMessage(grammar, ruleSequence[0], message);
+                return MatchMessage(ruleSequence[0], message);
             }
             else
             {
-                return MatchMessage(grammar, ruleSequence[0], message).SelectMany(residual => MatchSequence(grammar, new List<string>(ruleSequence.Skip(1)), residual));
+                return MatchMessage(ruleSequence[0], message).SelectMany(residual => MatchSequence(new List<string>(ruleSequence.Skip(1)), residual));
             }
         }
     }
