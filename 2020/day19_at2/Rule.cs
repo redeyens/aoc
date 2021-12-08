@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace day19_at2
 {
-    internal class Rule
+    internal abstract class Rule
     {
         private List<List<string>> options;
         private Func<string, Rule> ruleLookup;
@@ -45,40 +45,16 @@ namespace day19_at2
                     return new KeyValuePair<string, Rule>(ruleId, new Sequence(options.First(), ruleLookup));
                 }
             }
-            else
+            else if (options.Count == 2)
             {
-                return new KeyValuePair<string, Rule>(ruleId, new Rule(options, ruleLookup));
-            }
-        }
-
-        internal  virtual IEnumerable<string> MatchMessage(string message)
-        {
-            return MatchOptions(options, message);
-        }
-
-        private IEnumerable<string> MatchOptions(List<List<string>> ruleOptions, string message)
-        {
-            if(ruleOptions.Count == 1)
-            {
-                return MatchSequence(ruleOptions[0], message);
+                return new KeyValuePair<string, Rule>(ruleId, new Options(options.Select(seq => seq.Count == 1 ? (Rule)new Reference(seq.First(), ruleLookup) : (Rule)new Sequence(seq, ruleLookup))));
             }
             else
             {
-                return MatchSequence(ruleOptions[0], message).Concat(MatchOptions(new List<List<string>>(ruleOptions.Skip(1)), message));
+                throw new NotImplementedException();
             }
         }
 
-        private IEnumerable<string> MatchSequence(List<string> ruleSequence, string message)
-        {
-            Rule firstRule = ruleLookup(ruleSequence[0]);
-            if(ruleSequence.Count == 1)
-            {
-                return firstRule.MatchMessage(message);
-            }
-            else
-            {
-                return firstRule.MatchMessage(message).SelectMany(residual => MatchSequence(new List<string>(ruleSequence.Skip(1)), residual));
-            }
-        }
+        internal abstract IEnumerable<string> MatchMessage(string message);
     }
 }
