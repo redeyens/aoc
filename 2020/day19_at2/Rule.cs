@@ -34,6 +34,17 @@ namespace day19_at2
             {
                 return new KeyValuePair<string, Rule>(ruleId, new Literal(terminals.First()));
             }
+            else if (options.Count == 1)
+            {
+                if(options.First().Take(2).Count() == 1)
+                {
+                    return new KeyValuePair<string, Rule>(ruleId, new Reference(options.First().First(), ruleLookup));    
+                }
+                else
+                {
+                    return new KeyValuePair<string, Rule>(ruleId, new Sequence(options.First(), ruleLookup));
+                }
+            }
             else
             {
                 return new KeyValuePair<string, Rule>(ruleId, new Rule(options, ruleLookup));

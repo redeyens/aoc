@@ -7,7 +7,7 @@ namespace day19_at2
     {
         private string value;
 
-        public Literal(string value):base(null, null)
+        internal Literal(string value):base(null, null)
         {
             this.value = value;
         }
