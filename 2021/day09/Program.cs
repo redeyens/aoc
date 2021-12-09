@@ -11,12 +11,57 @@ namespace day09
         {
             string[] input = PuzzleInput.ToArray();
 
-            Console.WriteLine(GetLowPoints(input).Select(lp => 1 + lp).Sum());
+            var result = GetLowPoints(input)
+                .Select(coord => FloodBasin(input, coord.row, coord.col).Count())
+                .OrderByDescending(b => b)
+                .Take(3)
+                .Aggregate(1, (prod, curr) => prod *= curr);
+            
+            Console.WriteLine(result);
 
             Console.WriteLine("day09 completed.");
         }
 
-        private static IEnumerable<int> GetLowPoints(string[] input)
+        private static IEnumerable<(int row, int col)> FloodBasin(string[] input, int row, int col)
+        {
+            HashSet<(int row, int col)> basin = new HashSet<(int row, int col)>();
+            Queue<(int row, int col)> pointsToCheck = new Queue<(int row, int col)>();
+
+            pointsToCheck.Enqueue((row, col));
+
+            while (pointsToCheck.Count > 0)
+            {
+                var current = pointsToCheck.Dequeue();
+
+                if(input[current.row][current.col] == '9' || basin.Contains(current))
+                {
+                    continue;
+                }
+
+                basin.Add((current.row, current.col));
+
+                if(current.row > 0)
+                {
+                    pointsToCheck.Enqueue((current.row - 1, current.col));
+                }
+                if(current.row < (input.Length - 1))
+                {
+                    pointsToCheck.Enqueue((current.row + 1, current.col));
+                }
+                if(current.col > 0)
+                {
+                    pointsToCheck.Enqueue((current.row, current.col - 1));
+                }
+                if(current.col < (input[row].Length - 1))
+                {
+                    pointsToCheck.Enqueue((current.row, current.col + 1));
+                }
+            }
+
+            return basin;
+        }
+
+        private static IEnumerable<(int row, int col)> GetLowPoints(string[] input)
         {
             for (int j = 0; j < input.Length; j++)
             {
@@ -40,7 +85,7 @@ namespace day09
                         continue;
                     }
 
-                    yield return line[i] - '0';
+                    yield return (j, i);
                 }
             }
         }
