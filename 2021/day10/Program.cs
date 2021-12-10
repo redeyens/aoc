@@ -9,28 +9,37 @@ namespace day10
     {
         private static readonly Dictionary<char, int> scoreMap = new Dictionary<char, int>()
         {
-            {')', 3},
-            {']', 57},
-            {'}', 1197},
-            {'>', 25137}
+            {')', 1},
+            {']', 2},
+            {'}', 3},
+            {'>', 4}
         };
 
-        private static readonly HashSet<char> openingBrackets = new HashSet<char>() {'(', '[', '{', '<'};
+        private static readonly Dictionary<char, char> bracketPairs =  new Dictionary<char, char>()
+        {
+            {'(', ')'},
+            {'[', ']'},
+            {'{', '}'},
+            {'<', '>'}
+        };
 
         static void Main(string[] args)
         {
-            Console.WriteLine(PuzzleInput.SelectMany(line => GetIllegal(line)).GroupBy(c => c).Select(g => scoreMap[g.Key] * g.Count()).Sum());
+            var scores = PuzzleInput.Select(line => CloseBrackets(line).Aggregate(0L, (res, next) => res = res * 5 + scoreMap[next])).Where(s => s > 0).OrderBy(s => s).ToList();
+
+            Console.WriteLine(scores[scores.Count / 2]);
 
             Console.WriteLine("day10 completed.");
         }
 
-        private static IEnumerable<char> GetIllegal(string line)
+        private static IEnumerable<char> CloseBrackets(string line)
         {
             var charStack = new Stack<char>();
+            bool isValid = true;
 
             foreach (var nextBracket in line)
             {
-                if(openingBrackets.Contains(nextBracket))
+                if(bracketPairs.Keys.Contains(nextBracket))
                 {
                     charStack.Push(nextBracket);
                 }
@@ -39,13 +48,21 @@ namespace day10
                     char lastBracket = charStack.Peek();
                     if(Math.Abs(nextBracket - lastBracket) > 2)
                     {
-                        yield return nextBracket;
+                        isValid = false;
                         break;
                     }
                     else
                     {
                         charStack.Pop();
                     }
+                }
+            }
+
+            if(isValid)
+            {
+                while (charStack.Count > 0)
+                {
+                        yield return bracketPairs[charStack.Pop()];
                 }
             }
         }
