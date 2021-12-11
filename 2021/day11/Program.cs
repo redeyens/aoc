@@ -9,15 +9,19 @@ namespace day11
     {
         static void Main(string[] args)
         {
-            int flashes = 0;
+            int firstSyncedFlash = 0;
             var state = PuzzleInput.Select(line => line.Select(c => c - '0').ToArray()).ToArray();
 
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < 1000; i++)
             {
-                flashes += AdvanceOneStep(state);
+                if(AdvanceOneStep(state) == 100)
+                {
+                    firstSyncedFlash = i + 1;
+                    break;
+                }
             }
 
-            Console.WriteLine(flashes);
+            Console.WriteLine(firstSyncedFlash);
 
             Console.WriteLine("day11 completed.");
         }
