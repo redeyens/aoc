@@ -14,7 +14,7 @@ namespace day12
             Queue<List<string>> frontier = new Queue<List<string>>();
             int paths = 0;
 
-            frontier.Enqueue(new List<string>() {"start"});
+            frontier.Enqueue(new List<string>() { string.Empty, "start"});
 
             while (frontier.Count > 0)
             {
@@ -27,11 +27,21 @@ namespace day12
                     continue;
                 }
 
-                foreach (var cave in caveSystem[currentCave].Where(cave => char.IsUpper(cave[0]) || !currentPath.Contains(cave)))
+                IEnumerable<string> nextSteps = caveSystem[currentCave]
+                    .Where(cave => !cave.Equals("start") &&
+                        (char.IsUpper(cave[0]) || 
+                        !currentPath.Contains(cave) ||
+                        string.IsNullOrEmpty(currentPath[0]))
+                    );
+                foreach (var cave in nextSteps)
                 {
                     List<string> nextPath = new List<string>(currentPath.Count + 1);
                     nextPath.AddRange(currentPath);
                     nextPath.Add(cave);
+                    if(char.IsLower(cave[0]) && currentPath.Contains(cave))
+                    {
+                        nextPath[0] = cave;
+                    }
                     frontier.Enqueue(nextPath);
                 }
             }
