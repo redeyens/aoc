@@ -13,13 +13,26 @@ namespace day13
 
             var dots = inputBlocks[0].Split(Environment.NewLine).Select(line => {var coord = line.Split(','); return (x:int.Parse(coord[0]), y:int.Parse(coord[1]));}).ToHashSet();
 
-            var folds = inputBlocks[1].Split(Environment.NewLine).Select(line => line.Split(' ')[2]).Select(fold => {var p = fold.Split('='); return (axis:p[0], line:int.Parse(p[1]));});
+            var folds = inputBlocks[1].Split(Environment.NewLine).Select(line => line.Split(' ')[2]).Select(fold => {var p = fold.Split('='); return (axis:p[0], line:int.Parse(p[1]));}).ToList();
 
-            Fold(dots, folds.First());
+            folds.ForEach(f => Fold(dots, f));
 
-            Console.WriteLine(dots.Count);
+            Console.WriteLine(string.Join(Environment.NewLine, dots.GroupBy(d => d.y).OrderBy(g => g.Key).Select(g => LineToString(g.Select(el => el.x)))));
 
             Console.WriteLine("day13 completed.");
+        }
+
+        private static string LineToString(IEnumerable<int> xPositions)
+        {
+            int dimension = xPositions.Max();
+            char[] res = new string(' ', dimension + 1).ToCharArray();
+
+            foreach (var pos in xPositions)
+            {
+                res[pos] = '#';
+            }
+
+            return new string(res);
         }
 
         private static void Fold(HashSet<(int x, int y)> dots, (string axis, int line) foldLine)
