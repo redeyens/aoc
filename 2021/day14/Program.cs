@@ -9,8 +9,8 @@ namespace day14
     {
         static void Main(string[] args)
         {
-            var polymer = GetPairs(PuzzleInput.First());
-            var insertions = PuzzleInput.Skip(2).Select(i => i.Split(" -> ")).Select(s => (pair:s[0], el:s[1][0])).ToList();
+            var polymer = InitPairCount(PuzzleInput.First());
+            var insertions = PuzzleInput.Skip(2).Select(i => i.Split(" -> ")).Select(s => (first:s[0][0], second:s[0][1], el:s[1][0])).ToList();
             var pendingPairs = new List<(char first, char second, long cnt)>();
 
             for (int step = 0; step < 40; step++)
@@ -18,22 +18,21 @@ namespace day14
                 pendingPairs.Clear();
                 foreach (var ins in insertions)
                 {
-                    TouchEntry(polymer, ins.pair[0], ins.pair[1]);
+                    TouchEntry(polymer, ins.first, ins.second);
 
-                    long pairCount = polymer[ins.pair[0]][ins.pair[1]];
-                    pendingPairs.Add((ins.pair[0], ins.pair[1], -pairCount));
-                    pendingPairs.Add((ins.pair[0], ins.el, pairCount));
-                    pendingPairs.Add((ins.el, ins.pair[1], pairCount));
+                    long pairCount = polymer[(ins.first, ins.second)];
+                    pendingPairs.Add((ins.first, ins.second, -pairCount));
+                    pendingPairs.Add((ins.first, ins.el, pairCount));
+                    pendingPairs.Add((ins.el, ins.second, pairCount));
                 }
                 foreach (var pair in pendingPairs)
                 {
-                    polymer[pair.first][pair.second] += pair.cnt;
+                    polymer[(pair.first, pair.second)] += pair.cnt;
                 }
             }
 
-            var sortedElements = polymer.Values
-                .SelectMany(s => s.Select(e => (c:e.Key, cnt:e.Value)))
-                .GroupBy(e => e.c, e => e.cnt)
+            var sortedElements = polymer
+                .GroupBy(e => e.Key.second, e => e.Value)
                 .Select(g => g.Sum())
                 .OrderBy(c => c)
                 .ToList();
@@ -43,12 +42,11 @@ namespace day14
             Console.WriteLine("day14 completed.");
         }
 
-        private static Dictionary<char,Dictionary<char,long>> GetPairs(string startingPolymer)
+        private static Dictionary<(char first, char second),long> InitPairCount(string startingPolymer)
         {
-            var res = new Dictionary<char,Dictionary<char,long>>();
+            var res = new Dictionary<(char first, char second),long>();
 
-            res[default(char)] = new Dictionary<char, long>();
-            res[default(char)][startingPolymer[0]] = 1;
+            res[(default(char), startingPolymer[0])] = 1;
 
             for (int i = 1; i < startingPolymer.Length; i++)
             {
@@ -57,24 +55,17 @@ namespace day14
 
                 TouchEntry(res, firstChar, secondChar);
 
-                res[firstChar][secondChar] += 1;
+                res[(firstChar, secondChar)] += 1;
             }
 
             return res;
         }
 
-        private static void TouchEntry(Dictionary<char, Dictionary<char, long>> polymer, char firstChar, char secondChar)
+        private static void TouchEntry(Dictionary<(char first, char second),long> polymer, char firstChar, char secondChar)
         {
-            Dictionary<char, long> second;
-            if (!polymer.TryGetValue(firstChar, out second))
+            if (!polymer.TryGetValue((firstChar, secondChar), out long cnt))
             {
-                second = new Dictionary<char, long>();
-                polymer[firstChar] = second;
-            }
-
-            if (!second.TryGetValue(secondChar, out long cnt))
-            {
-                second[secondChar] = 0;
+                polymer[(firstChar, secondChar)] = 0;
             }
         }
 
