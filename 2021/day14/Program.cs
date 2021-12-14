@@ -14,7 +14,7 @@ namespace day14
             var pendingInsertions = new Stack<(int pos, char element)>();
             var pair = new char[2];
 
-            for (int step = 0; step < 10; step++)
+            for (int step = 0; step < 40; step++)
             {
                 for (int i = 1; i < polymer.Count; i++)
                 {
