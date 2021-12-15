@@ -11,38 +11,50 @@ namespace day15
         static void Main(string[] args)
         {
             var map = PuzzleInput.ToArray();
-            var goal = (x:map[0].Length - 1, y:map.Length - 1);
-            var riskMap = map.Select(row => row.Select(cell => int.MaxValue).ToArray()).ToArray();
-            HashSet<(int x, int y)> nextNodes = new HashSet<(int x, int y)>();
-            HashSet<(int x, int y)> visitedNodes = new HashSet<(int x, int y)>();
+            var goal = (x:map[0].Length * 5 - 1, y:map.Length * 5 - 1);
+            var nextNodes = new Dictionary<(int x, int y), int>();
+            var visitedNodes = new Dictionary<(int x, int y), int>();
 
-            nextNodes.Add((0,0));
-            riskMap[0][0] = 0;
+            nextNodes.Add((0,0), 0);
 
             while (nextNodes.Count > 0)
             {
-                var currentNode = nextNodes.OrderBy(n => riskMap[n.y][n.x] + EstimateRemainingRisk(n, goal)).First();
-                nextNodes.Remove(currentNode);
+                var currentNode = nextNodes.OrderBy(n => n.Value).First();
+                nextNodes.Remove(currentNode.Key);
 
-                if(currentNode == goal)
+                if(currentNode.Key == goal)
                 {
-                    Console.WriteLine(riskMap[currentNode.y][currentNode.x]);
+                    Console.WriteLine(currentNode.Value);
                     break;
                 }
 
-                visitedNodes.Add(currentNode);
-                foreach (var nextMove in GetPossibleMoves(currentNode, map).Except(visitedNodes))
+                visitedNodes[currentNode.Key] = currentNode.Value;
+                foreach (var nextMove in GetPossibleMoves(currentNode.Key, map).Where(nm => !visitedNodes.ContainsKey(nm)))
                 {
-                    int riskToNext = riskMap[currentNode.y][currentNode.x] + map[nextMove.y][nextMove.x] - '0';
-                    if(riskToNext < riskMap[nextMove.y][nextMove.x])
+                    int prevRiskToNext = 0;
+                    if (!nextNodes.TryGetValue(nextMove, out prevRiskToNext))
                     {
-                        riskMap[nextMove.y][nextMove.x] = riskToNext;
+                        prevRiskToNext = int.MaxValue;
                     }
-                    nextNodes.Add(nextMove);
+
+                    int riskToNext = currentNode.Value + GetNextRisk(map, nextMove);
+                    if (riskToNext < prevRiskToNext)
+                    {
+                        nextNodes[nextMove] = riskToNext;
+                    }
                 }
             }
 
             Console.WriteLine("day15 completed.");
+        }
+
+        private static int GetNextRisk(string[] map, (int x, int y) nextMove)
+        {
+            int localY = nextMove.y % map.Length;
+            int localX = nextMove.x % map[localY].Length;
+            int baseRisk = map[localY][localX] - '0';
+            baseRisk += nextMove.y / map.Length + nextMove.x / map[localY].Length;
+            return (baseRisk - 1) % 9 + 1;
         }
 
         private static IEnumerable<(int x, int y)> GetPossibleMoves((int x, int y) pos, string[] map)
@@ -55,19 +67,14 @@ namespace day15
             {
                 yield return (pos.x, pos.y - 1);
             }
-            if(pos.x < (map[pos.y].Length - 1))
+            if(pos.x < (map[pos.y % map.Length].Length * 5 - 1))
             {
                 yield return (pos.x + 1, pos.y);
             }
-            if(pos.y < (map.Length - 1))
+            if(pos.y < (map.Length * 5 - 1))
             {
                 yield return (pos.x, pos.y + 1);
             }
-        }
-
-        private static int EstimateRemainingRisk((int x, int y) p, (int x, int y) goal)
-        {
-            return goal.x - p.x + goal.y + p.y;
         }
 
         private static IEnumerable<string> TestInput
