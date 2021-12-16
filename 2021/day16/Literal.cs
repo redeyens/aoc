@@ -15,6 +15,8 @@ namespace day16
             this.num = num;
         }
 
+        internal override long Value => num;
+
         internal static Packet FromBitStream(int ver, int typeId, BitStream stream)
         {
             long num = 0;

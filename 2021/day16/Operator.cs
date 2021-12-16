@@ -4,11 +4,11 @@ using System.Linq;
 
 namespace day16
 {
-    internal class Operator : Packet
+    internal abstract class Operator : Packet
     {
-        private int ver;
+        protected int ver;
         private int typeId;
-        private List<Packet> subPackets;
+        protected List<Packet> subPackets;
 
         public Operator(int ver, int typeId, IEnumerable<Packet> packets)
         {
@@ -35,7 +35,25 @@ namespace day16
                 subPackets = Packet.FromBitStream(stream).Take(numSubPackets);
             }
 
-            return new Operator(ver, typeId, subPackets);
+            switch (typeId)
+            {
+                case 0:
+                    return new Sum(ver, typeId, subPackets);
+                case 1:
+                    return new Product(ver, typeId, subPackets);
+                case 2:
+                    return new Min(ver, typeId, subPackets);
+                case 3:
+                    return new Max(ver, typeId, subPackets);
+                case 5:
+                    return new GreaterThan(ver, typeId, subPackets);
+                case 6:
+                    return new LessThan(ver, typeId, subPackets);
+                case 7:
+                    return new EqualTo(ver, typeId, subPackets);
+                default:
+                    throw new ArgumentException("Unknown operator type.");
+            }
         }
 
         internal override int SumVersions() => subPackets.Select(p => p.SumVersions()).Sum() + ver;

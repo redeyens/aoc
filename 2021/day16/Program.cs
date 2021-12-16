@@ -29,9 +29,9 @@ namespace day16
 
         static void Main(string[] args)
         {
-            var message = PuzzleInput.Select(line => ConvertToBinary(line)).SelectMany(p => Packet.FromBitStream(new BitStream(p))).First();
+            var messages = PuzzleInput.Select(line => ConvertToBinary(line)).Select(p => Packet.FromBitStream(new BitStream(p)).First()).ToList();
 
-            Console.WriteLine(message.SumVersions());
+            messages.ForEach(p => Console.WriteLine(p.Value));
 
             Console.WriteLine("day16 completed.");
         }

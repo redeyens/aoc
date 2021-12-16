@@ -29,5 +29,7 @@ namespace day16
         }
 
         internal abstract int SumVersions();
+
+        internal abstract long Value { get; }
     }
 }
