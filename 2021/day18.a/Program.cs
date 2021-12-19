@@ -9,9 +9,14 @@ namespace day18.a
     {
         static void Main(string[] args)
         {
-            var result = PuzzleInput.Aggregate(string.Empty, SnailAdd);
+            var lines = PuzzleInput.ToList();
+            var result = lines
+                .SelectMany(first => lines.Select(second => (first: first, second: second)))
+                .Where(p => p.first != p.second)
+                .Select(p => GetMagnitude(SnailAdd(p.first, p.second)))
+                .Max();
 
-            Console.WriteLine(GetMagnitude(result));
+            Console.WriteLine(result);
 
             Console.WriteLine("day18.a completed.");
         }
