@@ -18,8 +18,10 @@ namespace day20
                 .Select(pixel => pixel.coord)
                 .ToHashSet();
             
-            image = Enahance(image, pixelMap, 0);
-            image = Enahance(image, pixelMap, 1);
+            for (int i = 0; i < 50; i++)
+            {
+                image = Enahance(image, pixelMap, i % 2);
+            }
 
             Console.WriteLine(image.Count);
 
