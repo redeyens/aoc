@@ -1,0 +1,14 @@
+{
+    "$schema": "http://json.schemastore.org/template",
+    "author": "redeyens",
+    "classifications": [ "Common", "Console"],
+    "identity": "redeyens.aoc.template",
+    "name": "redeyens Advent of Code projects",
+    "shortName": "aoc",
+    "tags": {
+      "language": "C#",
+      "type": "project"
+    },
+    "preferNameDirectory":true,
+    "sourceName": "aoc.template"
+  }
