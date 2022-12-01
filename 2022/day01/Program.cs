@@ -1,4 +1,4 @@
-﻿Console.WriteLine(GetCalorieLists(PuzzleInput()).Max(l => l.Sum()));
+﻿Console.WriteLine(GetCalorieLists(PuzzleInput()).Select(l => l.Sum()).OrderByDescending(c => c).Take(3).Sum());
 
 Console.WriteLine("day01 completed.");
 
