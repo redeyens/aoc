@@ -1,4 +1,24 @@
-﻿Console.WriteLine(PuzzleInput().Select(GetDoubledItem).Select(GetPriority).Sum());
+﻿var input = PuzzleInput().ToList();
+
+var badges = new List<char>();
+for (int g = 0; g < input.Count / 3; g++)
+{
+    int i = g * 3;
+    var first = input[i++];
+    var second = input[i++];
+    var third = input[i++];
+    for (int j = 0; j < first.Length; j++)
+    {
+        char b = first[j];
+        if (second.IndexOf(b) >= 0 && third.IndexOf(b) >= 0)
+        {
+            badges.Add(b);
+            break;
+        }
+    }
+}
+
+Console.WriteLine(badges.Select(GetPriority).Sum());
 
 int GetPriority(char item)
 {
@@ -7,25 +27,6 @@ int GetPriority(char item)
         return item - 'a' + 1;
     }
     return item - 'A' + 27;
-}
-
-char GetDoubledItem(string rucksack)
-{
-    var firstCompartment = new HashSet<int>();
-    int mid = rucksack.Length / 2;
-    for (int i = 0; i < mid; i++)
-    {
-        firstCompartment.Add(rucksack[i]);
-    }
-    for (int i = mid; i < rucksack.Length; i++)
-    {
-        var item = rucksack[i];
-        if (firstCompartment.Contains(item))
-        {
-            return item;
-        }
-    }
-    return default;
 }
 
 Console.WriteLine("day03 completed.");
