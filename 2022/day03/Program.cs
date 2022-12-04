@@ -1,21 +1,34 @@
-﻿Console.WriteLine(PuzzleInput().Select(ParseRanges).Where(x => Overlaps(x.first, x.second)).Count());
+﻿Console.WriteLine(PuzzleInput().Select(GetDoubledItem).Select(GetPriority).Sum());
 
-Console.WriteLine("day03 completed.");
-
-static ((int from, int to) first, (int from, int to) second) ParseRanges(string line)
+int GetPriority(char item)
 {
-    var pair = line.Split(',');
-    var firstRange = pair[0].Split('-');
-    var secondRange = pair[1].Split('-');
-
-    return ((int.Parse(firstRange[0]), int.Parse(firstRange[1])), (int.Parse(secondRange[0]), int.Parse(secondRange[1])));
+    if (item >= 'a' && item <= 'z')
+    {
+        return item - 'a' + 1;
+    }
+    return item - 'A' + 27;
 }
 
-static bool OneIsFullyContained((int from, int to) first, (int from, int to) second) => Contains(first, second) || Contains(second, first);
+char GetDoubledItem(string rucksack)
+{
+    var firstCompartment = new HashSet<int>();
+    int mid = rucksack.Length / 2;
+    for (int i = 0; i < mid; i++)
+    {
+        firstCompartment.Add(rucksack[i]);
+    }
+    for (int i = mid; i < rucksack.Length; i++)
+    {
+        var item = rucksack[i];
+        if (firstCompartment.Contains(item))
+        {
+            return item;
+        }
+    }
+    return default;
+}
 
-static bool Contains((int from, int to) first, (int from, int to) second) => first.from <= second.from && first.to >= second.to;
-
-static bool Overlaps((int from, int to) first, (int from, int to) second) => second.from <= first.to && first.from <= second.to;
+Console.WriteLine("day03 completed.");
 
 static IEnumerable<string> TestInput() => GetLinesFromResource("day03.Input.TestInput.txt");
 static IEnumerable<string> PuzzleInput() => GetLinesFromResource("day03.Input.PuzzleInput.txt");
