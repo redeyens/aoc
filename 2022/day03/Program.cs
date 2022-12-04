@@ -1,4 +1,4 @@
-﻿Console.WriteLine(PuzzleInput().Select(ParseRanges).Where(x => OneIsFullyContained(x.first, x.second)).Count());
+﻿Console.WriteLine(PuzzleInput().Select(ParseRanges).Where(x => Overlaps(x.first, x.second)).Count());
 
 Console.WriteLine("day03 completed.");
 
@@ -14,6 +14,8 @@ static ((int from, int to) first, (int from, int to) second) ParseRanges(string 
 static bool OneIsFullyContained((int from, int to) first, (int from, int to) second) => Contains(first, second) || Contains(second, first);
 
 static bool Contains((int from, int to) first, (int from, int to) second) => first.from <= second.from && first.to >= second.to;
+
+static bool Overlaps((int from, int to) first, (int from, int to) second) => second.from <= first.to && first.from <= second.to;
 
 static IEnumerable<string> TestInput() => GetLinesFromResource("day03.Input.TestInput.txt");
 static IEnumerable<string> PuzzleInput() => GetLinesFromResource("day03.Input.PuzzleInput.txt");
