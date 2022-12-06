@@ -21,7 +21,7 @@ static IEnumerable<string> GetLinesFromResource(string name)
 
 static int GetPacketStart(string signalBuffer)
 {
-    var window = signalBuffer[0..4].ToCharArray();
+    var window = signalBuffer[0..14].ToCharArray();
     int wIndex = window.Length - 1;
 
     for (int i = wIndex; i < signalBuffer.Length; i++)
