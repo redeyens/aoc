@@ -1,4 +1,6 @@
-﻿var root = new Directory("/", null, new List<FSNode>());
+﻿long diskSize = 70000000;
+long freeSpaceRequired = 30000000;
+var root = new Directory("/", null, new List<FSNode>());
 var current = root;
 
 foreach (string line in PuzzleInput())
@@ -31,14 +33,12 @@ foreach (string line in PuzzleInput())
     {
         current.Contents.Add(new File(entry[1], current, long.Parse(entry[0])));
     }
-
-    // Console.WriteLine(line);
 }
 
-// Console.WriteLine();
-// Console.WriteLine(root);
+long currentFreeSpace = diskSize - root.GetSize();
+long needToFree = freeSpaceRequired - currentFreeSpace;
 
-Console.WriteLine(root.Find(e => e.GetSize() <= 100000).Sum(e => e.GetSize()));
+Console.WriteLine(root.Find(e => e.GetSize() >= needToFree).OrderBy(e => e.GetSize()).First().GetSize());
 
 Console.WriteLine();
 Console.WriteLine("day07 completed.");
