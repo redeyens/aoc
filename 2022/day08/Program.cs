@@ -45,7 +45,69 @@ int alwaysVisibleCount = grid.Length * 2 + grid[0].Length * 2 - 4;
 
 Console.WriteLine(alwaysVisibleCount + internalVisibleTrees.Count);
 
+var maxScenicScore = internalVisibleTrees.Select(p => GetScenicScore(grid, p)).Max();
+
+Console.WriteLine(maxScenicScore);
+
 Console.WriteLine("day08 completed.");
+
+int GetScenicScore(char[][] grid, (int i, int j) p)
+{
+    int topViewDistance = GetTopViewDistance(grid, p.i, p.j);
+    int bottomViewDistance = GetBottomViewDistance(grid, p.i, p.j);
+    int leftViewDistance = GetLeftViewDistance(grid, p.i, p.j);
+    int rightViewDistance = GetRightViewDistance(grid, p.i, p.j);
+
+    return topViewDistance * bottomViewDistance * leftViewDistance * rightViewDistance;
+}
+
+int GetRightViewDistance(char[][] grid, int x, int y)
+{
+    for (int i = y + 1; i < grid[x].Length; i++)
+    {
+        if (grid[x][y] <= grid[x][i])
+        {
+            return i - y;
+        }
+    }
+    return grid[x].Length - y - 1;
+}
+
+int GetLeftViewDistance(char[][] grid, int x, int y)
+{
+    for (int i = y - 1; i >= 0; i--)
+    {
+        if (grid[x][y] <= grid[x][i])
+        {
+            return y - i;
+        }
+    }
+    return y;
+}
+
+int GetBottomViewDistance(char[][] grid, int x, int y)
+{
+    for (int i = x + 1; i < grid.Length; i++)
+    {
+        if (grid[x][y] <= grid[i][y])
+        {
+            return i - x;
+        }
+    }
+    return grid.Length - x - 1;
+}
+
+int GetTopViewDistance(char[][] grid, int x, int y)
+{
+    for (int i = x - 1; i >= 0; i--)
+    {
+        if (grid[x][y] <= grid[i][y])
+        {
+            return x - i;
+        }
+    }
+    return x;
+}
 
 static IEnumerable<string> TestInput() => GetLinesFromResource("day08.Input.TestInput.txt");
 static IEnumerable<string> PuzzleInput() => GetLinesFromResource("day08.Input.PuzzleInput.txt");
