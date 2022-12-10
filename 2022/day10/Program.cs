@@ -1,7 +1,32 @@
 ﻿int cycles = 0;
-long regX = 1;
-long sigStr = 0;
-var checkpoints = new int[] { 20, 60, 100, 140, 180, 220 };
+
+static void PrintPixel(int cycles, int regX)
+{
+    int pos = regX - (cycles % 40);
+    if (pos > -2 && pos < 2)
+    {
+        Console.Write("#");
+    }
+    else
+    {
+        Console.Write(".");
+    }
+}
+
+static void CheckEndOfRow(int cycles, int regX, int[] checkpoints, ref int checkIndex)
+{
+    if (checkIndex < 6)
+    {
+        if (cycles % checkpoints[checkIndex] == 0)
+        {
+            checkIndex++;
+            Console.WriteLine();
+        }
+    }
+}
+
+int regX = 1;
+var checkpoints = new int[] { 40, 80, 120, 160, 200, 240 };
 int checkIndex = 0;
 
 foreach (string line in PuzzleInput())
@@ -9,30 +34,21 @@ foreach (string line in PuzzleInput())
     var cmd = line.Split(' ');
     if (cmd[0].Equals("noop"))
     {
+        PrintPixel(cycles, regX);
         cycles++;
-        if (checkIndex < 6 && cycles % checkpoints[checkIndex] == 0)
-        {
-            sigStr += cycles * regX;
-            checkIndex++;
-        }
+        CheckEndOfRow(cycles, regX, checkpoints, ref checkIndex);
     }
     else
     {
-        cycles += 2;
-        if (checkIndex < 6)
-        {
-            var c = cycles % checkpoints[checkIndex];
-            if (c == 0 || c == 1)
-            {
-                sigStr += (cycles / checkpoints[checkIndex]) * checkpoints[checkIndex] * regX;
-                checkIndex++;
-            }
-        }
+        PrintPixel(cycles, regX);
+        cycles++;
+        CheckEndOfRow(cycles, regX, checkpoints, ref checkIndex);
+        PrintPixel(cycles, regX);
+        cycles++;
+        CheckEndOfRow(cycles, regX, checkpoints, ref checkIndex);
         regX += int.Parse(cmd[1]);
     }
 }
-
-Console.WriteLine(sigStr);
 
 Console.WriteLine("day10 completed.");
 
