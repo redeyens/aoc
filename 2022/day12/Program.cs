@@ -30,12 +30,17 @@ for (int r = 0; r < visitedLocations.Length; r++)
     visitedLocations[r] = new (int dist, bool done)[map[r].Length];
     for (int c = 0; c < visitedLocations[r].Length; c++)
     {
-        visitedLocations[r][c] = (int.MaxValue, false);
+        if (map[r][c] == 'a')
+        {
+            visitedLocations[r][c] = (0, false);
+            nextSteps.Enqueue((r, c), 0);
+        }
+        else
+        {
+            visitedLocations[r][c] = (int.MaxValue, false);
+        }
     }
 }
-
-visitedLocations[start.row][start.col].dist = 0;
-nextSteps.Enqueue(start, 0);
 
 while (nextSteps.Count > 0)
 {
