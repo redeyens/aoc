@@ -10,21 +10,23 @@ foreach (string line in PuzzleInput())
 var existingRocks = rocks.Count;
 var bottom = rocks.Max(r => r.y);
 
+var floor = bottom + 2;
+
 while (true)
 {
     var next = (x: 500, y: 0);
 
-    while (next.y <= bottom)
+    while (true)
     {
-        if (!rocks.Contains((next.x, next.y + 1)))
+        if (!rocks.Contains((next.x, next.y + 1)) && next.y + 1 < floor)
         {
             next.y += 1;
         }
-        else if (!rocks.Contains((next.x - 1, next.y + 1)))
+        else if (!rocks.Contains((next.x - 1, next.y + 1)) && next.y + 1 < floor)
         {
             next = (next.x - 1, next.y + 1);
         }
-        else if (!rocks.Contains((next.x + 1, next.y + 1)))
+        else if (!rocks.Contains((next.x + 1, next.y + 1)) && next.y + 1 < floor)
         {
             next = (next.x + 1, next.y + 1);
         }
@@ -35,7 +37,7 @@ while (true)
         }
     }
 
-    if (!rocks.Contains(next))
+    if (rocks.Contains((x: 500, y: 0)))
     {
         break;
     }
