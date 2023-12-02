@@ -5,6 +5,9 @@
 Console.WriteLine(TestInput().Select(l => Game.From(l)).Where(g => g.IsPossible(12, 13, 14)).Sum(g => g.Id));
 Console.WriteLine(PuzzleInput().Select(l => Game.From(l)).Where(g => g.IsPossible(12, 13, 14)).Sum(g => g.Id));
 
+Console.WriteLine(TestInput().Select(l => Game.From(l)).Sum(g => g.Power));
+Console.WriteLine(PuzzleInput().Select(l => Game.From(l)).Sum(g => g.Power));
+
 Console.WriteLine("day02 completed.");
 
 static IEnumerable<string> TestInput() => GetLinesFromResource("day02.Input.TestInput.txt");
@@ -33,6 +36,8 @@ internal class Game
     }
 
     public int Id => id;
+
+    public int Power => cubes["red"] * cubes["green"] * cubes["blue"];
 
     internal static Game From(string line)
     {
