@@ -5,7 +5,7 @@ var regexSym = new Regex(@"([^\d\.]+)", RegexOptions.Compiled);
 
 var prevNums = Enumerable.Empty<Match>();
 var prevSym = Enumerable.Empty<Match>();
-var partNums = new HashSet<Match>();
+var gears = new Dictionary<Match, HashSet<Match>>();
 foreach (string line in PuzzleInput())
 {
     var currentNums = regexNum.Matches(line);
@@ -13,11 +13,17 @@ foreach (string line in PuzzleInput())
     var currentSym = regexSym.Matches(line);
     var sym = prevSym.Concat(currentSym).ToList();
 
-    foreach (var num in nums)
+    foreach (var g in sym.Where(s => s.Value.Equals("*")))
     {
-        if (sym.Where(s => s.Index >= num.Index - 1 && s.Index <= num.Index + num.Length).Any())
+        if (!gears.TryGetValue(g, out HashSet<Match> gearRatio))
         {
-            partNums.Add(num);
+            gearRatio = new HashSet<Match>();
+            gears[g] = gearRatio;
+        }
+
+        foreach (var num in nums.Where(n => g.Index >= n.Index - 1 && g.Index <= n.Index + n.Length))
+        {
+            gearRatio.Add(num);
         }
     }
 
@@ -25,7 +31,7 @@ foreach (string line in PuzzleInput())
     prevSym = currentSym;
 }
 
-Console.WriteLine(partNums.Sum(m => int.Parse(m.Value)));
+Console.WriteLine(gears.Values.Where(gr => gr.Count == 2).Sum(g => g.Aggregate(1L, (product, next) => product * long.Parse(next.Value))));
 Console.WriteLine("day03 completed.");
 
 static IEnumerable<string> TestInput() => GetLinesFromResource("day03.Input.TestInput.txt");
