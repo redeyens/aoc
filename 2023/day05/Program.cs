@@ -1,6 +1,8 @@
-﻿var input = GetInput().Split(string.Join(string.Empty, Environment.NewLine, Environment.NewLine), StringSplitOptions.TrimEntries);
+﻿
+var input = GetInput().Split(string.Join(string.Empty, Environment.NewLine, Environment.NewLine), StringSplitOptions.TrimEntries);
 
-var seeds = input[0].Split(":", StringSplitOptions.TrimEntries)[1].Split(" ", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).Select(s => long.Parse(s));
+var seeds = input[0].Split(":", StringSplitOptions.TrimEntries)[1].Split(" ", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).Select(s => long.Parse(s)).ToList();
+var seedRanges = CreateSeedRanges(seeds);
 var seedToSoil = input[1].Split(Environment.NewLine, StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).Skip(1).Select(RangeMapFromLine).Aggregate(Mapping.Default, (cur, next) => cur.Prepend(next));
 var soilToFert = input[2].Split(Environment.NewLine, StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).Skip(1).Select(RangeMapFromLine).Aggregate(Mapping.Default, (cur, next) => cur.Prepend(next));
 var fertToWater = input[3].Split(Environment.NewLine, StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).Skip(1).Select(RangeMapFromLine).Aggregate(Mapping.Default, (cur, next) => cur.Prepend(next));
@@ -9,16 +11,16 @@ var lightToTemp = input[5].Split(Environment.NewLine, StringSplitOptions.TrimEnt
 var tempTohum = input[6].Split(Environment.NewLine, StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).Skip(1).Select(RangeMapFromLine).Aggregate(Mapping.Default, (cur, next) => cur.Prepend(next));
 var humToLoc = input[7].Split(Environment.NewLine, StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).Skip(1).Select(RangeMapFromLine).Aggregate(Mapping.Default, (cur, next) => cur.Prepend(next));
 
-var locs = seeds
-    .Select(seedToSoil.Map)
-    .Select(soilToFert.Map)
-    .Select(fertToWater.Map)
-    .Select(waterToLight.Map)
-    .Select(lightToTemp.Map)
-    .Select(tempTohum.Map)
-    .Select(humToLoc.Map);
+var locs = seedRanges
+    .SelectMany(seedToSoil.Map)
+    .SelectMany(soilToFert.Map)
+    .SelectMany(fertToWater.Map)
+    .SelectMany(waterToLight.Map)
+    .SelectMany(lightToTemp.Map)
+    .SelectMany(tempTohum.Map)
+    .SelectMany(humToLoc.Map);
 
-Console.WriteLine(locs.Min());
+Console.WriteLine(locs.Min(l => l.Start));
 Console.WriteLine("day05 completed.");
 
 RangeMapping RangeMapFromLine(string line)
@@ -37,6 +39,45 @@ string GetInput()
     using TextReader inReader = new StreamReader(inStream);
 
     return inReader.ReadToEnd();
+}
+
+IEnumerable<SeedRange> CreateSeedRanges(List<long> seeds)
+{
+    for (int i = 0; i < seeds.Count / 2; i++)
+    {
+        yield return new SeedRange(seeds[2 * i], seeds[2 * i + 1]);
+    }
+}
+
+internal class SeedRange
+{
+    private long rangeStart;
+    private long rangeLen;
+
+    public SeedRange(long rangeStart, long rangeLen)
+    {
+        this.rangeStart = rangeStart;
+        this.rangeLen = rangeLen;
+    }
+
+    public long Start => rangeStart;
+
+    public long End => rangeStart + rangeLen - 1;
+
+    internal IEnumerable<SeedRange> Split(long start)
+    {
+        if (start > rangeStart && start < rangeStart + rangeLen)
+        {
+            long leftLen = start - rangeStart;
+
+            yield return new SeedRange(rangeStart, leftLen);
+            yield return new SeedRange(start, rangeLen - leftLen);
+        }
+        else
+        {
+            yield return this;
+        }
+    }
 }
 
 internal class RangeMapping : Mapping
@@ -61,9 +102,19 @@ internal class RangeMapping : Mapping
         return new RangeMapping(destRangeStart, srcRangeStart, rangeLen, mapping);
     }
 
-    internal override bool CanMap(long num) => num >= srcRangeStart && num < srcRangeStart + rangeLen;
+    internal override IEnumerable<SeedRange> Map(SeedRange range)
+    {
+        var rangesToMap = range.Split(srcRangeStart).SelectMany(range => range.Split(srcRangeStart + rangeLen)).ToList();
 
-    internal override long Map(long num) => CanMap(num) ? num - srcRangeStart + destRangeStart : alternative.Map(num);
+        return rangesToMap
+            .Where(r => CanMap(r.Start))
+            .Select(r => new SeedRange(Map(r.Start), r.End - r.Start + 1))
+            .Concat(rangesToMap.Where(r => !CanMap(r.Start)).SelectMany(alternative.Map));
+    }
+
+    private bool CanMap(long num) => num >= srcRangeStart && num < srcRangeStart + rangeLen;
+
+    private long Map(long num) => num - srcRangeStart + destRangeStart;
 }
 
 internal abstract class Mapping
@@ -74,16 +125,15 @@ internal abstract class Mapping
 
     protected abstract Mapping WithAlternative(Mapping mapping);
 
-    internal abstract long Map(long num);
-
-    internal abstract bool CanMap(long num);
+    internal abstract IEnumerable<SeedRange> Map(SeedRange range);
 }
 
 internal class NoMapping : Mapping
 {
     protected override Mapping WithAlternative(Mapping mapping) => this;
 
-    internal override bool CanMap(long num) => true;
-
-    internal override long Map(long num) => num;
+    internal override IEnumerable<SeedRange> Map(SeedRange range)
+    {
+        yield return range;
+    }
 }
