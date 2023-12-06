@@ -1,17 +1,13 @@
 ﻿
 var input = PuzzleInput();
-var times = input.First().Split(":", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)[1].Split(" ", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).Select(s => long.Parse(s)).ToList();
-var records = input.Skip(1).First().Split(":", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)[1].Split(" ", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).Select(s => long.Parse(s)).ToList();
+var time = long.Parse(input.First().Split(":", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)[1].Replace(" ", string.Empty));
+var record = long.Parse(input.Skip(1).First().Split(":", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)[1].Replace(" ", string.Empty));
 var combinations = 1L;
 
-for (int i = 0; i < times.Count; i++)
-{
-    var minStart = FindMinStartTime(0, times[i], records[i], times[i]);
-    var maxStart = times[i] - minStart;
-    var numStarts = maxStart - minStart + 1;
-    combinations *= numStarts;
-    System.Console.WriteLine(numStarts);
-}
+var minStart = FindMinStartTime(0, time, record, time);
+var maxStart = time - minStart;
+var numStarts = maxStart - minStart + 1;
+combinations *= numStarts;
 
 System.Console.WriteLine("---------------------------");
 Console.WriteLine(combinations);
