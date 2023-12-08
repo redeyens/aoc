@@ -1,7 +1,7 @@
 ﻿var input = PuzzleInput();
 
 var handsValue = input.Select(line => line.Split(" ", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries))
-    .Select(a => (hand: a[0], bid: int.Parse(a[1]), val: GetHandValue(a[0])))
+    .Select(a => (hand: a[0], bid: int.Parse(a[1]), val: GetTheBestHandValue(a[0])))
     .OrderBy(h => h, new HandComparer())
     .Select((x, i) => x.bid * (i + 1L))
     .Sum();
@@ -13,6 +13,11 @@ static IEnumerable<string> TestInput() => GetLinesFromResource("day07.Input.Test
 static IEnumerable<string> PuzzleInput() => GetLinesFromResource("day07.Input.PuzzleInput.txt");
 
 static int GetHandValue(string hand) => hand.GroupBy(c => c).GroupBy(g => g.Count()).Select(g => g.Count() << ((g.Key - 1) * 3)).Sum();
+
+static int GetTheBestHandValue(string hand)
+    => hand.Equals("JJJJJ")
+    ? GetHandValue(hand)
+    : hand.Where(c => c != 'J').Distinct().Select(c => GetHandValue(hand.Replace('J', c))).Max();
 
 static IEnumerable<string> GetLinesFromResource(string name)
 {
@@ -28,7 +33,7 @@ static IEnumerable<string> GetLinesFromResource(string name)
 
 internal class HandComparer : IComparer<(string hand, int bid, int val)>
 {
-    private List<char> cards = new List<char>() { 'A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2' };
+    private List<char> cards = new List<char>() { 'A', 'K', 'Q', 'T', '9', '8', '7', '6', '5', '4', '3', '2', 'J' };
 
     public int Compare((string hand, int bid, int val) x, (string hand, int bid, int val) y)
     {
