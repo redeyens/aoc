@@ -6,12 +6,12 @@ foreach (string line in PuzzleInput())
     var lastVal = new Stack<int>();
     while (measurements.Any(m => m != 0))
     {
-        lastVal.Push(measurements.Last());
+        lastVal.Push(measurements.First());
         measurements = measurements.Take(measurements.Count - 1).Zip(measurements.Skip(1)).Select(x => x.Second - x.First).ToList();
     }
     while (lastVal.Count > 1)
     {
-        lastVal.Push(lastVal.Pop() + lastVal.Pop());
+        lastVal.Push((-lastVal.Pop()) + lastVal.Pop());
     }
 
     total += lastVal.Pop();
