@@ -8,8 +8,8 @@ foreach (string line in PuzzleInput())
 
     right.Add(long.Parse(locations[1]));
 }
-
-var res = left.OrderBy(x => x).Zip(right.OrderBy(x => x), (l, r) => Math.Abs(l - r)).Sum();
+var second = right.GroupBy(x => x).ToDictionary(g => g.Key, g => g.Count());
+var res = left.Sum(x => x * (second.ContainsKey(x) ? second[x] : 0));
 
 System.Console.WriteLine(res);
 
