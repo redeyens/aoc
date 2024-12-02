@@ -4,9 +4,13 @@ foreach (string line in PuzzleInput())
 {
     report.Clear();
     report.AddRange(line.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).Select(x => int.Parse(x)));
-    var dr = report.Zip(report.Skip(1), (l, r) => r - l);
-    if (dr.All(x => Math.Abs(x) > 0 && Math.Abs(x) < 4)
-    && dr.GroupBy(x => Math.Sign(x)).Count() == 1)
+
+    var dumpenedReports = report.Select((x, i) => report.Take(i).Concat(report.Skip(i + 1).Take(report.Count - 1))).Prepend(report)
+    .Select(x => x.Zip(x.Skip(1), (l, r) => r - l))
+    .Where(dr => dr.All(x => Math.Abs(x) > 0 && Math.Abs(x) < 4)
+        && dr.GroupBy(x => Math.Sign(x)).Count() == 1);
+
+    if (dumpenedReports.Any())
     {
         res++;
     }
