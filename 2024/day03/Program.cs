@@ -1,13 +1,29 @@
 ﻿using System.Text.RegularExpressions;
 
-var re = new Regex(@"mul\((\d+),(\d+)\)", RegexOptions.Compiled);
+var re = new Regex(@"((mul)\((\d+),(\d+)\))|((do)\(\))|((don't)\(\))", RegexOptions.Compiled);
 long res = 0;
+bool enabled = true;
 
 foreach (string line in PuzzleInput())
 {
     foreach (Match match in re.Matches(line))
     {
-        res += long.Parse(match.Groups[1].Value) * long.Parse(match.Groups[2].Value);
+        System.Console.WriteLine(match.Groups[0].Value);
+        if (match.Groups[2].Value.Equals("mul"))
+        {
+            if (enabled)
+            {
+                res += long.Parse(match.Groups[3].Value) * long.Parse(match.Groups[4].Value);
+            }
+        }
+        else if (match.Groups[6].Value.Equals("do"))
+        {
+            enabled = true;
+        }
+        else
+        {
+            enabled = false;
+        }
     }
 }
 
