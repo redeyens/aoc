@@ -1,59 +1,22 @@
 ﻿var lines = PuzzleInput().ToList();
 int res = 0;
 
-for (int i = 0; i < lines.Count; i++)
+for (int i = 0; i < lines.Count - 2; i++)
 {
-    for (int j = 0; j < lines[i].Length; j++)
+    for (int j = 0; j < lines[i].Length - 2; j++)
     {
-        if (j < lines[i].Length - 3)
+        var c1 = new char[3];
+        var c2 = new char[3];
+        for (int k = 0; k < 3; k++)
         {
-            var w = lines[i].Substring(j, 4);
-            if (w.Equals("XMAS") || w.Equals("SAMX"))
-            {
-                res++;
-            }
+            c1[k] = lines[i + k][j + k];
+            c2[k] = lines[i + k][j + 2 - k];
         }
-
-        if (i < lines.Count - 3)
+        var w1 = new string(c1);
+        var w2 = new string(c2);
+        if ((w1.Equals("MAS") || w1.Equals("SAM")) && (w2.Equals("MAS") || w2.Equals("SAM")))
         {
-            var c = new char[4];
-            for (int k = 0; k < 4; k++)
-            {
-                c[k] = lines[i + k][j];
-            }
-            var w = new string(c);
-            if (w.Equals("XMAS") || w.Equals("SAMX"))
-            {
-                res++;
-            }
-        }
-
-        if (j < lines[i].Length - 3 && i < lines.Count - 3)
-        {
-            var c = new char[4];
-            for (int k = 0; k < 4; k++)
-            {
-                c[k] = lines[i + k][j + k];
-            }
-            var w = new string(c);
-            if (w.Equals("XMAS") || w.Equals("SAMX"))
-            {
-                res++;
-            }
-        }
-
-        if (j > 2 && i < lines.Count - 3)
-        {
-            var c = new char[4];
-            for (int k = 0; k < 4; k++)
-            {
-                c[k] = lines[i + k][j - k];
-            }
-            var w = new string(c);
-            if (w.Equals("XMAS") || w.Equals("SAMX"))
-            {
-                res++;
-            }
+            res++;
         }
     }
 }
