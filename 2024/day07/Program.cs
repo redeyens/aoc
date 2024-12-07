@@ -5,7 +5,7 @@ foreach (string line in PuzzleInput())
     var elements = equation[1].Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).Select(x => long.Parse(x)).Reverse().ToList();
     var testResult = long.Parse(equation[0]);
     var bitCount = elements.Count - 1;
-    if (Enumerable.Range(0, 1 << bitCount).Any(operationMap => ProducesTestValue(testResult, elements, operationMap)))
+    if (Enumerable.Range(0, 1 << 2 * bitCount).Any(operationMap => ProducesTestValue(testResult, elements, operationMap)))
     {
         result += testResult;
     }
@@ -20,20 +20,27 @@ bool ProducesTestValue(long testResult, List<long> elements, int operationMap)
     var state = new Stack<long>(elements);
     while (state.Count > 1)
     {
-        var currentOperation = operationMap & 1;
-        if (currentOperation == 0)
+        var currentOperation = operationMap & 3;
+        switch (currentOperation)
         {
-            state.Push(state.Pop() + state.Pop());
-        }
-        else
-        {
-            state.Push(state.Pop() * state.Pop());
+            case 0:
+                state.Push(state.Pop() + state.Pop());
+                break;
+            case 1:
+                state.Push(state.Pop() * state.Pop());
+                break;
+            case 2:
+                var num = state.Pop().ToString();
+                num += state.Pop().ToString();
+                state.Push(long.Parse(num));
+                break;
+            default: return false;
         }
         if (state.Peek() > testResult)
         {
             return false;
         }
-        operationMap >>= 1;
+        operationMap >>= 2;
     }
 
     return testResult == state.Peek();
