@@ -8,33 +8,41 @@ var antennas = new Dictionary<char, List<(int row, int col)>>();
 foreach (string line in PuzzleInput())
 {
     colCount = line.Length;
-    foreach (var antenna in am.Matches(line).Select(m => (f: m.Value, loc: (row: row, col: m.Index))))
+    foreach (var (f, loc) in am.Matches(line).Select(m => (f: m.Value, loc: (row: row, col: m.Index))))
     {
-        if (!antennas.TryGetValue(antenna.f[0], out var bucket))
+        if (!antennas.TryGetValue(f[0], out var bucket))
         {
-            antennas[antenna.f[0]] = bucket = new List<(int row, int col)>();
+            antennas[f[0]] = bucket = new List<(int row, int col)>();
         }
-        bucket.Add(antenna.loc);
+        bucket.Add(loc);
     }
     row++;
 }
 var rowCount = row;
 
 var res = antennas.Values.SelectMany(bucket => bucket.SelectMany(b1 => bucket.Where(x => x != b1).Select(b2 => (first: b1, second: b2))))
-    .Select(Project)
-    .Where(x => x.row >= 0 && x.col >= 0 && x.row < rowCount && x.col < colCount)
+    .SelectMany(Project)
     .Distinct()
     .ToList();
 
 Console.WriteLine(res.Count);
 Console.WriteLine("day08 completed.");
 
-(int row, int col) Project(((int row, int col) first, (int row, int col) second) pair)
+IEnumerable<(int row, int col)> Project(((int row, int col) first, (int row, int col) second) pair)
 {
-    var pRow = 2 * pair.second.row - pair.first.row;
-    var pCol = 2 * pair.second.col - pair.first.col;
-
-    return (pRow, pCol);
+    for (int i = 0; ; i++)
+    {
+        var pRow = pair.second.row + i * (pair.second.row - pair.first.row);
+        var pCol = pair.second.col + i * (pair.second.col - pair.first.col);
+        if (pRow >= 0 && pCol >= 0 && pRow < rowCount && pCol < colCount)
+        {
+            yield return (pRow, pCol);
+        }
+        else
+        {
+            break;
+        }
+    }
 }
 
 static IEnumerable<string> TestInput() => GetLinesFromResource("day08.Input.TestInput.txt");
