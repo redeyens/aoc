@@ -1,50 +1,45 @@
-﻿using System.Security.Cryptography.X509Certificates;
-
-var line = PuzzleInput().First();
+﻿var line = PuzzleInput().First();
 var diskSize = 0;
-for (int i = 0; i < line.Length; i++)
-{
-    diskSize += line[i] - '0';
-}
-var disk = new int[diskSize];
-var diskPos = 0;
+var files = new (long offset, long size)[line.Length / 2 + line.Length % 2];
 var fileId = 0;
+var freeSpace = new (long offset, long size)[line.Length / 2];
+var freeSpaceId = 0;
+
 for (int i = 0; i < line.Length; i++)
 {
-    var blockCount = line[i] - '0';
-    var fileToWrite = -1;
+    var blockSize = line[i] - '0';
     if (i % 2 == 0)
     {
-        fileToWrite = fileId++;
+        files[fileId++] = (diskSize, blockSize);
     }
-    for (int j = 0; j < blockCount; j++)
+    else
     {
-        disk[diskPos++] = fileToWrite;
+        freeSpace[freeSpaceId++] = (diskSize, blockSize);
     }
+    diskSize += blockSize;
 }
 
-var front = 0;
-var back = diskSize - 1;
-
-while (back > front)
+for (int i = files.Length - 1; i > 0; i--)
 {
-    while (disk[front] >= 0)
+    for (int j = 0; j < freeSpace.Length; j++)
     {
-        front++;
+        if (freeSpace[j].size >= files[i].size && freeSpace[j].offset < files[i].offset)
+        {
+            files[i].offset = freeSpace[j].offset;
+            freeSpace[j].offset += files[i].size;
+            freeSpace[j].size -= files[i].size;
+            // no need to create free space in place of moved file since we don't plan to move files towards the end of the disk
+        }
     }
-
-    while (disk[back] < 0)
-    {
-        back--;
-    }
-    (disk[front], disk[back]) = (disk[back], disk[front]);
-    front++;
-    back--;
 }
 
-Console.WriteLine(disk.Where(x => x >= 0).Select((x, i) => (long)x * i).Sum());
+Console.WriteLine(files.Select((file, fileId) => fileId * SumBetween(file.offset, file.offset + file.size - 1)).Sum());
 
 Console.WriteLine("day09 completed.");
+
+static long SumUpTo(long n) => n * (n + 1) / 2;
+
+static long SumBetween(long m, long n) => SumUpTo(n) - SumUpTo(m - 1);
 
 static IEnumerable<string> TestInput() => GetLinesFromResource("day09.Input.TestInput.txt");
 static IEnumerable<string> PuzzleInput() => GetLinesFromResource("day09.Input.PuzzleInput.txt");
