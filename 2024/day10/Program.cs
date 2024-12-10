@@ -4,7 +4,7 @@ var trailHeads = map.SelectMany((line, row) => line.Select((c, col) => (c, row, 
     .Where(pos => pos.c == '0')
     .Select(pos => (pos.row, pos.col));
 
-var trails = trailHeads.Select(trailHead => (trailHead, ends: GetAllTrails(map, trailHead).Distinct().ToList())).ToList();
+var trails = trailHeads.Select(trailHead => (trailHead, ends: GetAllTrails(map, trailHead).ToList())).ToList();
 var totalScore = trails.Sum(trailHead => trailHead.ends.Count());
 
 Console.WriteLine(totalScore);
