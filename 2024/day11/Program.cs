@@ -1,34 +1,53 @@
-﻿var stones = PuzzleInput().First().Split(" ", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).Select(x => long.Parse(x));
+﻿using System.Collections.Concurrent;
 
-for (int i = 0; i < 25; i++)
+var initialStones = PuzzleInput().First().Split(" ", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).Select(x => long.Parse(x));
+var stones = new Queue<(long stone, long count)>(initialStones.Select(x => (x, 1L)));
+var visited = new ConcurrentDictionary<long, long>();
+for (int i = 0; i < 75; i++)
 {
     stones = Blink(stones);
 }
 
-Console.WriteLine(stones.Count());
+Console.WriteLine(stones.Sum(x => x.count));
 
 Console.WriteLine("day11 completed.");
 
-IEnumerable<long> Blink(IEnumerable<long> stones)
+Queue<(long stone, long count)> Blink(Queue<(long stone, long count)> stones)
 {
-    foreach (var stone in stones)
+    while (stones.Count > 0)
     {
-        var stoneString = stone.ToString();
-        if (stone == 0)
+        var current = stones.Dequeue();
+
+        if (current.stone == 0)
         {
-            yield return 1;
-        }
-        else if (stoneString.Length % 2 == 0)
-        {
-            var half = stoneString.Length / 2;
-            yield return long.Parse(stoneString[..half]);
-            yield return long.Parse(stoneString[half..]);
+            visited.AddOrUpdate(1L, current.count, (s, c) => c + current.count);
         }
         else
         {
-            yield return stone * 2024;
+            var stoneString = current.stone.ToString();
+
+            if (stoneString.Length % 2 == 0)
+            {
+                var half = stoneString.Length / 2;
+                var left = long.Parse(stoneString[..half]);
+                var right = long.Parse(stoneString[half..]);
+                visited.AddOrUpdate(left, current.count, (s, c) => c + current.count);
+                visited.AddOrUpdate(right, current.count, (s, c) => c + current.count);
+            }
+            else
+            {
+                visited.AddOrUpdate(current.stone * 2024, current.count, (s, c) => c + current.count);
+            }
         }
     }
+
+    foreach (var stone in visited)
+    {
+        stones.Enqueue((stone.Key, stone.Value));
+    }
+    visited.Clear();
+
+    return stones;
 }
 
 static IEnumerable<string> TestInput() => GetLinesFromResource("day11.Input.TestInput.txt");
